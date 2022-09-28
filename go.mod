@@ -1,4 +1,4 @@
-module all-sounds
+module allsounds
 
 go 1.19
 
