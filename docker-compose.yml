@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    restart: "no"
+    environment:
+      POSTGRES_PASSWORD: -NQI2tIM?|G>B@A2
+      POSTGRES_DB: all-sounds
+  
+  server:
+    build:
+      context: ./
+    depends_on:
+      - db
