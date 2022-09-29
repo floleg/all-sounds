@@ -1,24 +1,24 @@
 ## Build
-FROM golang:1.19-alpine3.16 AS build
-WORKDIR /cmd
+FROM golang:1.19 AS build
+
+WORKDIR /usr/src/app
 
 COPY go.mod ./
 COPY go.sum ./
 
-RUN go mod download
+RUN go mod download && go mod verify
 
 COPY ./db ./db
 COPY ./server ./server
 
-WORKDIR /cmd/server
-
-RUN go build -o ./server
+RUN go build -v -o /usr/local/bin/server ./server
 
 ## Deploy
-FROM gcr.io/distroless/base-debian10
+FROM debian:buster-slim
+RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-WORKDIR /
+COPY --from=build /usr/local/bin/server /server
 
-COPY --from=build /cmd/server /server
-
-ENTRYPOINT ["/server"]
+CMD ["/server"]
