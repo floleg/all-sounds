@@ -3,19 +3,21 @@ package main
 import (
 	"allsounds/pkg/config"
 	"allsounds/pkg/db"
-	"fmt"
+	"allsounds/pkg/migration"
 	"log"
 	"os"
 )
 
 func main() {
+	// Retrieve configuration based on ENV system variable
 	config, err := config.LoadConfig(os.Getenv("ENV"), "./configs")
 	if err != nil {
 		log.Fatal("cannot load config:", err)
 	}
 
+	// Open postgres connection
 	db.Init(&config)
-	db.GetDB()
 
-	fmt.Println("Hello world")
+	// Run initial SQL migrations
+	migration.CreateTables()
 }
