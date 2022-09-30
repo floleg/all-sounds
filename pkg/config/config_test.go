@@ -33,7 +33,7 @@ func TestLoadConfig(t *testing.T) {
 		testname := fmt.Sprintf("%s", tt.name)
 		t.Run(testname, func(t *testing.T) {
 			// Here we expect LoadConfig to panic because the config file should not exist
-			// USe the https://go.dev/doc/effective_go#recover trick to catch the actual panic
+			// USe the https://go.dev/doc/effective_go#recover trick to regain routine control
 			if tt.panic {
 				defer func() {
 					if r := recover(); r != nil {
