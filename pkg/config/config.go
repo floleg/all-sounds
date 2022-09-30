@@ -14,8 +14,8 @@ type Config struct {
 	DBName     string `mapstructure:"DB_NAME"`
 }
 
-func LoadConfig(env string) (config Config, err error) {
-	viper.AddConfigPath("./configs")
+func LoadConfig(env string, configpath string) (config Config, err error) {
+	viper.AddConfigPath(configpath)
 	viper.SetConfigName(env)
 	viper.SetConfigType("yaml")
 
