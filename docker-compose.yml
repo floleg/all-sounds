@@ -5,6 +5,8 @@ services:
   db:
     image: postgres
     restart: "no"
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: -NQI2tIM?|G>B@A2
       POSTGRES_DB: all-sounds
@@ -14,3 +16,5 @@ services:
       context: ./
     depends_on:
       - db
+    environment:
+      - ENV=${ENV}

@@ -1,0 +1,5 @@
+DB_HOST: db
+DB_PORT: 5432
+DB_USER: postgres
+DB_PASSWORD: -NQI2tIM?|G>B@A2
+DB_NAME: all-sounds
