@@ -8,9 +8,8 @@ COPY go.sum ./
 
 ADD ./configs ./configs
 
-COPY ./cmd/server ./cmd/server
-COPY ./pkg/config ./pkg/config
-COPY ./pkg/db ./pkg/db
+ADD ./cmd ./cmd
+ADD ./pkg ./pkg
 
 RUN go build -v -o /usr/local/bin/server ./cmd/server
 

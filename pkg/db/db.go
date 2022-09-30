@@ -3,28 +3,51 @@ package db
 import (
 	"allsounds/pkg/config"
 	"fmt"
+	"log"
+	"os"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var (
-	db *gorm.DB
+	DBCon *gorm.DB
 )
 
 func Init(config *config.Config) {
-	// conn := fmt.Sprintf("host=db port=5432 user=%s password=%s dbname=%s sslmode=disable",
-	// os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
-
+	// Build gorm connection string
 	conn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		config.DBHost, config.DBPort, config.DBUSer, config.DBPassword, config.DBName)
 
-	_, err := gorm.Open(postgres.Open(conn), &gorm.Config{})
+	// Instantiate SQL logger
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Warn,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
+		},
+	)
+
+	// Open gorm connection
+	DBCon, err := gorm.Open(postgres.Open(conn), &gorm.Config{
+		Logger: newLogger,
+	})
+
+	setDB(DBCon)
+
 	if err != nil {
 		panic(err)
 	}
 }
 
+func setDB(db *gorm.DB) {
+	DBCon = db
+}
+
 func GetDB() *gorm.DB {
-	return db
+	return DBCon
 }
