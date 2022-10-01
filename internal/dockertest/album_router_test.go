@@ -92,5 +92,5 @@ func TestSearch(t *testing.T) {
 
 	data := []model.Album{}
 	json.NewDecoder(w.Body).Decode(&data)
-	assert.Equal(t, len(data), 51)
+	assert.Equal(t, len(data), 52)
 }
