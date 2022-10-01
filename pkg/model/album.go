@@ -6,7 +6,7 @@ type Album struct {
 	Entity
 	Title       string
 	ReleaseYear uint8
-	Tracks      []Track
+	Tracks      []Track `faker:"-"`
 }
 
 func (a Album) FindAll(offset int, limit int) []Album {
