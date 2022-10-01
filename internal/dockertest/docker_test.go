@@ -3,6 +3,7 @@ package dockertest
 import (
 	"allsounds/pkg/config"
 	"allsounds/pkg/db"
+	"allsounds/pkg/migration"
 	"log"
 	"os"
 	"testing"
@@ -71,6 +72,7 @@ func setup() {
 
 func TestMain(m *testing.M) {
 	setup()
+	migration.CreateTables()
 	code := m.Run()
 	cleanupDocker()
 	os.Exit(code)

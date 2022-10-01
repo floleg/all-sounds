@@ -14,7 +14,7 @@ func NewRouter() *gin.Engine {
 	album := new(controller.AlbumController)
 
 	// Album entity routes declarations
-	router.GET("/album", album.GetAlbums)
+	router.GET("/album", album.Search)
 	router.GET("/album/:id", album.GetAlbumById)
 
 	return router

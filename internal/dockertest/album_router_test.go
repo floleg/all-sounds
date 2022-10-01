@@ -15,9 +15,7 @@ import (
 )
 
 // Without offset or limit url parameters, endpoint will return 400
-func TestAlbumsWithoutPagination(t *testing.T) {
-	migration.CreateTables()
-
+func TestFindAllWithoutPagination(t *testing.T) {
 	router := router.NewRouter()
 
 	w := httptest.NewRecorder()
@@ -29,9 +27,8 @@ func TestAlbumsWithoutPagination(t *testing.T) {
 }
 
 // Test endpoint pagination
-func TestAlbums(t *testing.T) {
-	migration.CreateTables()
-	migration.BulkInsertAlbums()
+func TestFindAll(t *testing.T) {
+	migration.BulkInsertAlbums(1000)
 
 	router := router.NewRouter()
 
@@ -51,8 +48,6 @@ func TestAlbums(t *testing.T) {
 
 // Passing a string as ID should return 400
 func TestAlbumByIdWithString(t *testing.T) {
-	migration.CreateTables()
-
 	router := router.NewRouter()
 
 	w := httptest.NewRecorder()
@@ -65,8 +60,7 @@ func TestAlbumByIdWithString(t *testing.T) {
 }
 
 func TestAlbumById(t *testing.T) {
-	migration.CreateTables()
-	album := migration.InsertAlbum()
+	album := migration.InsertAlbum("Album Title 1")
 
 	router := router.NewRouter()
 
@@ -82,4 +76,21 @@ func TestAlbumById(t *testing.T) {
 
 	assert.Equal(t, &album.ID, &data.ID)
 	assert.Equal(t, &album.Title, &data.Title)
+}
+
+func TestSearch(t *testing.T) {
+	router := router.NewRouter()
+
+	for i := 0; i <= 50; i++ {
+		migration.InsertAlbum(fmt.Sprintf("Album Title %v", i))
+	}
+
+	query := "Title"
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/album?query=%s&offset=0&limit=100", query), nil)
+	router.ServeHTTP(w, req)
+
+	data := []model.Album{}
+	json.NewDecoder(w.Body).Decode(&data)
+	assert.Equal(t, len(data), 51)
 }

@@ -13,7 +13,7 @@ type AlbumController struct{}
 var albumModel = new(model.Album)
 
 // getAlbums responds with the list of all albums as JSON.
-func (a AlbumController) GetAlbums(c *gin.Context) {
+func (a AlbumController) Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
@@ -29,9 +29,14 @@ func (a AlbumController) GetAlbums(c *gin.Context) {
 		return
 	}
 
-	albums := albumModel.FindAll(offset, limit)
-
-	c.IndentedJSON(http.StatusOK, albums)
+	// If a quary string has been passed, search albums by title, else fetch all
+	if c.Query("query") != "" {
+		albums := albumModel.Search(offset, limit, c.Query("query"))
+		c.IndentedJSON(http.StatusOK, albums)
+	} else {
+		albums := albumModel.FindAll(offset, limit)
+		c.IndentedJSON(http.StatusOK, albums)
+	}
 }
 
 // getAlbums responds with a single album as JSON.

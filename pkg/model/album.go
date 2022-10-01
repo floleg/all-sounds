@@ -1,6 +1,8 @@
 package model
 
-import "allsounds/pkg/db"
+import (
+	"allsounds/pkg/db"
+)
 
 type Album struct {
 	Entity
@@ -12,6 +14,13 @@ type Album struct {
 func (a Album) FindAll(offset int, limit int) []Album {
 	var albums []Album
 	db.DBCon.Order("title asc").Limit(limit).Offset(offset).Find(&albums)
+
+	return albums
+}
+
+func (a Album) Search(offset int, limit int, query string) []Album {
+	var albums []Album
+	db.DBCon.Order("title asc").Limit(limit).Offset(offset).Where("title LIKE ?", "%"+query+"%").Find(&albums)
 
 	return albums
 }
