@@ -33,3 +33,18 @@ func (a AlbumController) GetAlbums(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, albums)
 }
+
+// getAlbums responds with a single album as JSON.
+func (a AlbumController) GetAlbumById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		c.Abort()
+		return
+	}
+
+	album := albumModel.FindById(id)
+
+	c.IndentedJSON(http.StatusOK, album)
+}

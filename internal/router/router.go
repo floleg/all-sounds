@@ -15,6 +15,7 @@ func NewRouter() *gin.Engine {
 
 	// Album entity routes declarations
 	router.GET("/album", album.GetAlbums)
+	router.GET("/album/:id", album.GetAlbumById)
 
 	return router
 }

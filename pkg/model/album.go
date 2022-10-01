@@ -15,3 +15,10 @@ func (a Album) FindAll(offset int, limit int) []Album {
 
 	return albums
 }
+
+func (a Album) FindById(id int) Album {
+	var album Album
+	db.DBCon.First(&album, id)
+
+	return album
+}

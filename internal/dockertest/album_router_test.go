@@ -48,3 +48,38 @@ func TestAlbums(t *testing.T) {
 		assert.Equal(t, len(data), 100)
 	}
 }
+
+// Passing a string as ID should return 400
+func TestAlbumByIdWithString(t *testing.T) {
+	migration.CreateTables()
+
+	router := router.NewRouter()
+
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/album/misguided-id", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, w.Code, 400)
+	assert.Equal(t, w.Body.String(), "{\"message\":\"bad request\"}")
+}
+
+func TestAlbumById(t *testing.T) {
+	migration.CreateTables()
+	album := migration.InsertAlbum()
+
+	router := router.NewRouter()
+
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/album/%v", album.ID), nil)
+	router.ServeHTTP(w, req)
+
+	data := model.Album{}
+
+	assert.Equal(t, w.Code, 200)
+	json.NewDecoder(w.Body).Decode(&data)
+
+	assert.Equal(t, &album.ID, &data.ID)
+	assert.Equal(t, &album.Title, &data.Title)
+}

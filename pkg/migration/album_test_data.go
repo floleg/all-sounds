@@ -18,3 +18,13 @@ func BulkInsertAlbums() {
 
 	db.DBCon.Create(&albums)
 }
+
+func InsertAlbum() model.Album {
+	var album = model.Album{}
+
+	faker.FakeData(&album)
+
+	db.DBCon.Create(&album)
+
+	return album
+}
