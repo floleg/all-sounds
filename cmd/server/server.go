@@ -1,6 +1,7 @@
 package main
 
 import (
+	"allsounds/internal/router"
 	"allsounds/pkg/config"
 	"allsounds/pkg/db"
 	"allsounds/pkg/migration"
@@ -20,4 +21,8 @@ func main() {
 
 	// Run initial SQL migrations
 	migration.CreateTables()
+
+	// Instantiate gin router
+	router := router.NewRouter()
+	router.Run("0.0.0.0:8080")
 }

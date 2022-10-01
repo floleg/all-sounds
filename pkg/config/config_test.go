@@ -43,7 +43,6 @@ func TestLoadConfig(t *testing.T) {
 
 				LoadConfig(tt.name, "../../configs")
 				t.Errorf("Panic was expected")
-
 			} else {
 				// Check that the loaded confiuration is conform as exepected if the file exists on filesytem
 				config, _ := LoadConfig(tt.name, "../../configs")

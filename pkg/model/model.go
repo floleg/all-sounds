@@ -11,13 +11,6 @@ type User struct {
 	UserTrackFavorites []UserTrackFavorite
 }
 
-type Album struct {
-	Entity
-	Title       string
-	ReleaseYear uint8
-	Tracks      []Track
-}
-
 type Track struct {
 	Entity
 	Title              string

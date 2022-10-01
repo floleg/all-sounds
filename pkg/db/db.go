@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	DBCon *gorm.DB
+	dbCon *gorm.DB
 )
 
 func Init(config *config.Config) {
@@ -45,9 +45,9 @@ func Init(config *config.Config) {
 }
 
 func setDB(db *gorm.DB) {
-	DBCon = db
+	dbCon = db
 }
 
 func GetDB() *gorm.DB {
-	return DBCon
+	return dbCon
 }

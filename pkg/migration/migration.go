@@ -7,27 +7,27 @@ import (
 
 func CreateTables() {
 	// Create user table if not existing in current db
-	if (!db.DBCon.Migrator().HasTable(&model.User{})) {
-		db.DBCon.Migrator().CreateTable(&model.User{})
+	if (!db.GetDB().Migrator().HasTable(&model.User{})) {
+		db.GetDB().Migrator().CreateTable(&model.User{})
 	}
 
 	// Create artist table if not existing in current db
-	if (!db.DBCon.Migrator().HasTable(&model.Artist{})) {
-		db.DBCon.Migrator().CreateTable(&model.Artist{})
+	if (!db.GetDB().Migrator().HasTable(&model.Artist{})) {
+		db.GetDB().Migrator().CreateTable(&model.Artist{})
 	}
 
 	// Create album table if not existing in current db
-	if (!db.DBCon.Migrator().HasTable(&model.Album{})) {
-		db.DBCon.Migrator().CreateTable(&model.Album{})
+	if (!db.GetDB().Migrator().HasTable(&model.Album{})) {
+		db.GetDB().Migrator().CreateTable(&model.Album{})
 	}
 
 	// Create track table if not existing in current db
-	if (!db.DBCon.Migrator().HasTable(&model.Track{})) {
-		db.DBCon.Migrator().CreateTable(&model.Track{})
+	if (!db.GetDB().Migrator().HasTable(&model.Track{})) {
+		db.GetDB().Migrator().CreateTable(&model.Track{})
 	}
 
 	// Create user_track_favorite table if not existing in current db
-	if (!db.DBCon.Migrator().HasTable(&model.UserTrackFavorite{})) {
-		db.DBCon.Migrator().CreateTable(&model.UserTrackFavorite{})
+	if (!db.GetDB().Migrator().HasTable(&model.UserTrackFavorite{})) {
+		db.GetDB().Migrator().CreateTable(&model.UserTrackFavorite{})
 	}
 }
