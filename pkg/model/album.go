@@ -6,7 +6,7 @@ import (
 
 type Album struct {
 	Entity
-	Title       string
+	Title       string `faker:"sentence"`
 	ReleaseYear uint8
 	Tracks      []Track `faker:"-"`
 }

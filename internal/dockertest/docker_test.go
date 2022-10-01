@@ -72,7 +72,11 @@ func setup() {
 
 func TestMain(m *testing.M) {
 	setup()
+
+	// Execute tests common migrations
 	migration.CreateTables()
+	migration.BulkInsertAlbums(1000)
+
 	code := m.Run()
 	cleanupDocker()
 	os.Exit(code)

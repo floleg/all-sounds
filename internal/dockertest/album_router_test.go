@@ -28,8 +28,6 @@ func TestFindAllWithoutPagination(t *testing.T) {
 
 // Test endpoint pagination
 func TestFindAll(t *testing.T) {
-	migration.BulkInsertAlbums(1000)
-
 	router := router.NewRouter()
 
 	w := httptest.NewRecorder()
@@ -81,16 +79,12 @@ func TestAlbumById(t *testing.T) {
 func TestSearch(t *testing.T) {
 	router := router.NewRouter()
 
-	for i := 0; i <= 50; i++ {
-		migration.InsertAlbum(fmt.Sprintf("Album Title %v", i))
-	}
-
-	query := "Title"
+	query := "accusantium"
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/album?query=%s&offset=0&limit=100", query), nil)
 	router.ServeHTTP(w, req)
 
 	data := []model.Album{}
 	json.NewDecoder(w.Body).Decode(&data)
-	assert.Equal(t, len(data), 52)
+	assert.Equal(t, len(data), 100)
 }
