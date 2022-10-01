@@ -16,7 +16,7 @@ var (
 	DBCon *gorm.DB
 )
 
-func Init(config *config.Config) {
+func Init(config *config.Config) error {
 	// Build gorm connection string
 	conn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		config.DBHost, config.DBPort, config.DBUSer, config.DBPassword, config.DBName)
@@ -26,28 +26,21 @@ func Init(config *config.Config) {
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
 			SlowThreshold:             time.Second,
-			LogLevel:                  logger.Warn,
+			LogLevel:                  logger.Info,
 			IgnoreRecordNotFoundError: true,
 			Colorful:                  true,
 		},
 	)
 
 	// Open gorm connection
-	DBCon, err := gorm.Open(postgres.Open(conn), &gorm.Config{
+	var err error
+	DBCon, err = gorm.Open(postgres.Open(conn), &gorm.Config{
 		Logger: newLogger,
 	})
 
-	setDB(DBCon)
-
 	if err != nil {
-		panic(err)
+		return err
 	}
-}
 
-func setDB(db *gorm.DB) {
-	DBCon = db
-}
-
-func GetDB() *gorm.DB {
-	return DBCon
+	return nil
 }

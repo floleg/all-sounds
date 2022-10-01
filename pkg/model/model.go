@@ -1,21 +1,21 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Entity struct {
-	gorm.Model
+	ID        uint `gorm:"primaryKey" faker:"-"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index" faker:"-"`
 }
 
 type User struct {
 	Entity
 	UserTrackFavorites []UserTrackFavorite
-}
-
-type Album struct {
-	Entity
-	Title       string
-	ReleaseYear uint8
-	Tracks      []Track
 }
 
 type Track struct {
