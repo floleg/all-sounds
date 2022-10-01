@@ -29,7 +29,7 @@ func (a AlbumController) Search(c *gin.Context) {
 		return
 	}
 
-	// If a quary string has been passed, search albums by title, else fetch all
+	// If a query string has been passed, search albums by title, else fetch all
 	if c.Query("query") != "" {
 		albums := albumModel.Search(offset, limit, c.Query("query"))
 		c.IndentedJSON(http.StatusOK, albums)
