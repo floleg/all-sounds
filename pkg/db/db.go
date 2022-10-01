@@ -16,7 +16,7 @@ var (
 	dbCon *gorm.DB
 )
 
-func Init(config *config.Config) {
+func Init(config *config.Config) error {
 	// Build gorm connection string
 	conn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		config.DBHost, config.DBPort, config.DBUSer, config.DBPassword, config.DBName)
@@ -40,8 +40,10 @@ func Init(config *config.Config) {
 	setDB(DBCon)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
 func setDB(db *gorm.DB) {
