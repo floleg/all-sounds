@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	dbCon *gorm.DB
+	DBCon *gorm.DB
 )
 
 func Init(config *config.Config) error {
@@ -33,23 +33,14 @@ func Init(config *config.Config) error {
 	)
 
 	// Open gorm connection
-	DBCon, err := gorm.Open(postgres.Open(conn), &gorm.Config{
+	var err error
+	DBCon, err = gorm.Open(postgres.Open(conn), &gorm.Config{
 		Logger: newLogger,
 	})
-
-	setDB(DBCon)
 
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func setDB(db *gorm.DB) {
-	dbCon = db
-}
-
-func GetDB() *gorm.DB {
-	return dbCon
 }

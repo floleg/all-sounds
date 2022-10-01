@@ -11,7 +11,7 @@ type Album struct {
 
 func (a Album) FindAll(offset int, limit int) []Album {
 	var albums []Album
-	db.GetDB().Order("title asc").Limit(limit).Offset(offset).Find(&albums)
+	db.DBCon.Order("title asc").Limit(limit).Offset(offset).Find(&albums)
 
 	return albums
 }
