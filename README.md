@@ -7,7 +7,7 @@ Hi Deezer people, I'm Florent! This a proposition of a Go implementation for the
 
 A few tools can be useful to build, run, and test this application: 
 - [go 1.19](https://go.dev/doc/install) to buil the sources;
-- [docker](https://docs.docker.com/get-started/) and [docker-compose](https://docs.docker.com/compose/) to run the application in a container;
+- [docker](https://docs.docker.com/get-started/) and [docker-compose](https://docs.docker.com/compose/) to run the stack in containers;
 - [jq](https://stedolan.github.io/jq/) to get nicely formatted json responses.
 
 ## Toolchain
