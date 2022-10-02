@@ -80,6 +80,8 @@ func TestMain(m *testing.M) {
 
 	migration.BulkInsertAlbums(artists, 10)
 
+	migration.BulkInsertUsers(10)
+
 	code := m.Run()
 	cleanupDocker()
 	os.Exit(code)

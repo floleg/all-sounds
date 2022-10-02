@@ -33,16 +33,16 @@ func (a AlbumController) Search(c *gin.Context) {
 	var data []model.Album
 	// If a query string has been passed, search albums by title, else fetch all
 	if c.Query("query") != "" {
-		albums := albumRepository.BaseRepo.Search(offset, limit, c.Query("query"), data)
+		albums := albumRepository.BaseRepo.Search(offset, limit, c.Query("query"), data, "title")
 		c.IndentedJSON(http.StatusOK, albums)
 	} else {
-		albums := albumRepository.BaseRepo.FindAll(offset, limit, data)
+		albums := albumRepository.BaseRepo.FindAll(offset, limit, data, "title")
 		c.IndentedJSON(http.StatusOK, albums)
 	}
 }
 
 // getAlbums responds with a single album as JSON.
-func (a AlbumController) GetAlbumById(c *gin.Context) {
+func (a AlbumController) GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {

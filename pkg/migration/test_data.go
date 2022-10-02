@@ -45,13 +45,16 @@ func BulkInsertAlbums(artists []*model.Artist, number int) []*model.Album {
 	return albums
 }
 
-func InsertAlbum(title string) model.Album {
-	var album = model.Album{}
+func BulkInsertUsers(number int) []model.User {
+	var users = []model.User{}
 
-	faker.FakeData(&album)
-	album.Title = title
+	for i := 0; i < number; i++ {
+		user := model.User{}
+		faker.FakeData(&user)
+		users = append(users, user)
+	}
 
-	db.DBCon.Create(&album)
+	db.DBCon.Create(&users)
 
-	return album
+	return users
 }

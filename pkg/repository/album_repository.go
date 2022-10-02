@@ -6,11 +6,11 @@ import (
 )
 
 type AlbumRepository struct {
-	BaseRepo repository
+	BaseRepo Repository
 }
 
 // Retrieve Album by id, eager loading AlbumTracks associations
-func (ar AlbumRepository) FindById(id int, album model.Album) (interface{}, error) {
+func (ar AlbumRepository) FindById(id int, album model.Album) (model.Album, error) {
 	err := db.DBCon.Model(&model.Album{}).Preload("Tracks").First(&album, id).Error
 
 	return album, err
