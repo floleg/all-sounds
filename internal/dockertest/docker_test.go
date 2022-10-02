@@ -75,7 +75,10 @@ func TestMain(m *testing.M) {
 
 	// Execute tests common migrations
 	migration.CreateTables()
-	migration.BulkInsertAlbums(1000)
+
+	artists := migration.BulkInsertArtists(2)
+
+	migration.BulkInsertAlbums(artists, 10)
 
 	code := m.Run()
 	cleanupDocker()

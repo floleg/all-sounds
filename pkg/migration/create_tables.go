@@ -11,6 +11,5 @@ func CreateTables() {
 		&model.Artist{},
 		&model.Track{},
 		&model.User{},
-		&model.UserTrackFavorite{},
 	)
 }

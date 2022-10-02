@@ -8,10 +8,7 @@ import (
 	"testing"
 
 	"allsounds/internal/router"
-	"allsounds/pkg/migration"
 	"allsounds/pkg/model"
-
-	"github.com/magiconair/properties/assert"
 )
 
 // Without offset or limit url parameters, endpoint will return 400
@@ -22,8 +19,13 @@ func TestFindAllWithoutPagination(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/album", nil)
 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, w.Code, 400)
-	assert.Equal(t, w.Body.String(), "{\"message\":\"bad request\"}")
+	if w.Code != 400 {
+		t.Errorf("got %v, want %v", w.Code, 400)
+	}
+
+	if w.Body.String() != "{\"message\":\"bad request\"}" {
+		t.Errorf("got %v, want %v", w.Body.String(), "{\"message\":\"bad request\"}")
+	}
 }
 
 // Test endpoint pagination
@@ -32,15 +34,20 @@ func TestFindAll(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	for i := 0; i <= 900; i += 100 {
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/album?offset=%v&limit=100", i), nil)
+	for i := 0; i <= 9; i += 10 {
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/album?offset=%v&limit=10", i), nil)
 		router.ServeHTTP(w, req)
 
-		assert.Equal(t, w.Code, 200)
+		if w.Code != 200 {
+			t.Errorf("got %v, want %v", w.Code, 200)
+		}
 
 		data := []model.Album{}
 		json.NewDecoder(w.Body).Decode(&data)
-		assert.Equal(t, len(data), 100)
+
+		if len(data) != 10 {
+			t.Errorf("got %v, want %v", len(data), 10)
+		}
 	}
 }
 
@@ -53,27 +60,41 @@ func TestAlbumByIdWithString(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/album/misguided-id", nil)
 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, w.Code, 400)
-	assert.Equal(t, w.Body.String(), "{\"message\":\"bad request\"}")
+	if w.Code != 400 {
+		t.Errorf("got %v, want %v", w.Code, 400)
+	}
+
+	if w.Body.String() != "{\"message\":\"bad request\"}" {
+		t.Errorf("got %v, want %v", w.Body.String(), "{\"message\":\"bad request\"}")
+	}
 }
 
 func TestAlbumById(t *testing.T) {
-	album := migration.InsertAlbum("Album Title 1")
-
 	router := router.NewRouter()
 
 	w := httptest.NewRecorder()
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/album/%v", album.ID), nil)
+	// First search in album list to retreieve an actual album id
+	findAllReq, _ := http.NewRequest("GET", "/album?offset=0&limit=1", nil)
+	router.ServeHTTP(w, findAllReq)
+	albums := []model.Album{}
+	json.NewDecoder(w.Body).Decode(&albums)
+
+	// Fetch single album with previously retrieved id
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/album/%v", albums[0].ID), nil)
 	router.ServeHTTP(w, req)
 
-	data := model.Album{}
+	album := model.Album{}
 
-	assert.Equal(t, w.Code, 200)
-	json.NewDecoder(w.Body).Decode(&data)
+	if w.Code != 200 {
+		t.Errorf("got %v, want %v", w.Code, 200)
+	}
 
-	assert.Equal(t, &album.ID, &data.ID)
-	assert.Equal(t, &album.Title, &data.Title)
+	json.NewDecoder(w.Body).Decode(&album)
+
+	if len(album.Tracks) != 10 {
+		t.Errorf("got %v, want %v", len(album.Tracks), 10)
+	}
 }
 
 func TestSearch(t *testing.T) {
@@ -82,10 +103,13 @@ func TestSearch(t *testing.T) {
 	// we assume that the following
 	query := "accusantium"
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/album?query=%s&offset=0&limit=100", query), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/album?query=%s&offset=0&limit=10", query), nil)
 	router.ServeHTTP(w, req)
 
 	data := []model.Album{}
 	json.NewDecoder(w.Body).Decode(&data)
-	assert.Equal(t, len(data), 100)
+
+	if len(data) != 10 {
+		t.Errorf("got %v, want %v", len(data), 10)
+	}
 }
