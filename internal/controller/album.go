@@ -51,7 +51,7 @@ func (a AlbumController) GetAlbumById(c *gin.Context) {
 		return
 	}
 
-	var data *model.Album
+	var data model.Album
 	album := r.FindById(id, data)
 
 	c.IndentedJSON(http.StatusOK, album)
