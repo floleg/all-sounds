@@ -88,12 +88,12 @@ func TestAlbumById(t *testing.T) {
 
 	json.NewDecoder(w.Body).Decode(&data)
 
-	if &album.ID != &data.ID {
-		t.Errorf("got %v, want %v", &data.ID, &album.ID)
+	if album.ID != data.ID {
+		t.Errorf("got %v, want %v", data.ID, album.ID)
 	}
 
-	if &album.Title != &data.Title {
-		t.Errorf("got %v, want %v", &data.Title, &album.Title)
+	if album.Title != data.Title {
+		t.Errorf("got %v, want %v", data.Title, album.Title)
 	}
 }
 
