@@ -14,5 +14,4 @@ func (tr TrackRepository) FindById(id int, track model.Track) (model.Track, erro
 	err := db.DBCon.Model(&model.Track{}).Preload("Albums").First(&track, id).Error
 
 	return track, err
-
 }

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"allsounds/internal/router"
+	"allsounds/pkg/db"
 	"allsounds/pkg/model"
 )
 
@@ -77,16 +78,8 @@ func TestTrackById(t *testing.T) {
 				json.NewDecoder(w.Body).Decode(&tracks)
 
 				// Fetch single track with previously retrieved id
-				req, _ := http.NewRequest("GET", fmt.Sprintf("/track/%v", tracks[0].ID), nil)
-				router.ServeHTTP(w, req)
-
-				track := model.Track{}
-
-				if w.Code != 200 {
-					t.Errorf("got %v, want %v", w.Code, 200)
-				}
-
-				json.NewDecoder(w.Body).Decode(&track)
+				var track model.Track
+				_ = db.DBCon.Model(&model.Track{}).Preload("Albums").First(&track, tracks[0].ID).Error
 
 				if len(track.Albums) < 1 {
 					t.Errorf("got %v, want an inflated albums slice", len(track.Albums))
