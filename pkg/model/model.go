@@ -20,11 +20,17 @@ type User struct {
 
 type Track struct {
 	Entity
-	Title              string
-	AlbumID            uint
+	Title              string `faker:"sentence"`
 	Order              uint8
 	ArtistID           uint
 	UserTrackFavorites []UserTrackFavorite
+	AlbumTracks        []AlbumTrack `faker:"-"`
+}
+
+type AlbumTrack struct {
+	Entity
+	AlbumID uint
+	TrackID uint
 }
 
 type Artist struct {

@@ -10,6 +10,7 @@ func CreateTables() {
 		&model.Album{},
 		&model.Artist{},
 		&model.Track{},
+		&model.AlbumTrack{},
 		&model.User{},
 		&model.UserTrackFavorite{},
 	)
