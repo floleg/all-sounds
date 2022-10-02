@@ -33,10 +33,10 @@ func (a ArtistController) Search(c *gin.Context) {
 	var data []model.Artist
 	// If a query string has been passed, search artists by title, else fetch all
 	if c.Query("query") != "" {
-		artists := artistRepository.BaseRepo.Search(offset, limit, c.Query("query"), data)
+		artists := artistRepository.BaseRepo.Search(offset, limit, c.Query("query"), data, "name")
 		c.IndentedJSON(http.StatusOK, artists)
 	} else {
-		artists := artistRepository.BaseRepo.FindAll(offset, limit, data)
+		artists := artistRepository.BaseRepo.FindAll(offset, limit, data, "name")
 		c.IndentedJSON(http.StatusOK, artists)
 	}
 }
