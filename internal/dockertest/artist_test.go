@@ -35,7 +35,7 @@ func TestFindAllArtists(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	for i := 0; i <= 1; i += 1 {
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/artist?offset=%v&limit=10", i), nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/artist?offset=%v&limit=1", i), nil)
 		router.ServeHTTP(w, req)
 
 		if w.Code != 200 {
@@ -45,8 +45,8 @@ func TestFindAllArtists(t *testing.T) {
 		data := []model.Artist{}
 		json.NewDecoder(w.Body).Decode(&data)
 
-		if len(data) != 2 {
-			t.Errorf("got %v, want %v", len(data), 2)
+		if len(data) != 1 {
+			t.Errorf("got %v, want %v", len(data), 1)
 		}
 	}
 }
