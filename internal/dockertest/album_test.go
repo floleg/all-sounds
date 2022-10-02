@@ -114,7 +114,6 @@ func TestAlbumById(t *testing.T) {
 func TestAlbumsSearch(t *testing.T) {
 	router := router.NewRouter()
 
-	// we assume that the following
 	query := "accusantium"
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/album?query=%s&offset=0&limit=10", query), nil)

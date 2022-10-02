@@ -114,7 +114,6 @@ func TestArtistById(t *testing.T) {
 func TestSearchArtist(t *testing.T) {
 	router := router.NewRouter()
 
-	// we assume that the following
 	query := ""
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/artist?query=%s&offset=0&limit=10", query), nil)

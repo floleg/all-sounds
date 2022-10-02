@@ -26,5 +26,11 @@ func NewRouter() *gin.Engine {
 	router.GET("/track", track.Search)
 	router.GET("/track/:id", track.GetById)
 
+	// Track entity routes declarations
+	user := new(controller.UserController)
+	router.GET("/user", user.Search)
+	router.GET("/user/:id", user.GetById)
+	router.POST("/user/:userId/track/:trackId", user.AppendUserTrack)
+
 	return router
 }

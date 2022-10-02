@@ -12,8 +12,3 @@ type Entity struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index" faker:"-"`
 }
-
-type User struct {
-	Entity
-	Tracks []Track `gorm:"many2many:user_tracks;" faker:"-"`
-}

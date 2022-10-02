@@ -24,8 +24,8 @@ func (b Repository) Search(offset int, limit int, query string, data interface{}
 	return data
 }
 
-func (b Repository) FindById(id int, data interface{}) interface{} {
+func (b Repository) FindById(id int, data interface{}) *interface{} {
 	db.DBCon.First(&data, id)
 
-	return data
+	return &data
 }
