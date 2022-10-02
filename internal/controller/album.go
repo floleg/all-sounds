@@ -11,7 +11,7 @@ import (
 
 type AlbumController struct{}
 
-var r = new(repository.Repository)
+var albumRepository = new(repository.AlbumRepository)
 
 // getAlbums responds with the list of all albums as JSON.
 func (a AlbumController) Search(c *gin.Context) {
@@ -33,10 +33,10 @@ func (a AlbumController) Search(c *gin.Context) {
 	var data []model.Album
 	// If a query string has been passed, search albums by title, else fetch all
 	if c.Query("query") != "" {
-		albums := r.Search(offset, limit, c.Query("query"), data)
+		albums := albumRepository.BaseRepo.Search(offset, limit, c.Query("query"), data)
 		c.IndentedJSON(http.StatusOK, albums)
 	} else {
-		albums := r.FindAll(offset, limit, data)
+		albums := albumRepository.BaseRepo.FindAll(offset, limit, data)
 		c.IndentedJSON(http.StatusOK, albums)
 	}
 }
@@ -52,7 +52,13 @@ func (a AlbumController) GetAlbumById(c *gin.Context) {
 	}
 
 	var data model.Album
-	album := r.FindById(id, &data)
+	album, err := albumRepository.FindById(id, data)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		c.Abort()
+		return
+	}
 
 	c.IndentedJSON(http.StatusOK, album)
 }

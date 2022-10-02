@@ -15,32 +15,19 @@ type Entity struct {
 
 type User struct {
 	Entity
-	UserTrackFavorites []UserTrackFavorite
+	Tracks []Track `gorm:"many2many:user_tracks;" faker:"-"`
 }
 
 type Track struct {
 	Entity
-	Title              string `faker:"sentence"`
-	Order              uint8
-	ArtistID           uint
-	UserTrackFavorites []UserTrackFavorite
-	AlbumTracks        []AlbumTrack `faker:"-"`
-}
-
-type AlbumTrack struct {
-	Entity
-	AlbumID uint
-	TrackID uint
+	Title    string `faker:"sentence"`
+	Order    uint8
+	ArtistID uint
+	Users    []User  `gorm:"many2many:user_tracks;" faker:"-"`
+	Albums   []Album `gorm:"many2many:album_tracks;" faker:"-"`
 }
 
 type Artist struct {
 	Entity
-	Name   string
-	Tracks []Track
-}
-
-type UserTrackFavorite struct {
-	Entity
-	UserID  uint
-	TrackID uint
+	Name string
 }

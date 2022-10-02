@@ -4,21 +4,26 @@ import (
 	"allsounds/pkg/db"
 )
 
-type Repository struct{}
+type BaseRepository interface {
+	FindAll(offset int, limit int, data interface{}) interface{}
+	Search(offset int, limit int, query string, data interface{}) interface{}
+}
 
-func (r *Repository) FindAll(offset int, limit int, data interface{}) interface{} {
+type repository struct{}
+
+func (b repository) FindAll(offset int, limit int, data interface{}) interface{} {
 	db.DBCon.Order("title asc").Limit(limit).Offset(offset).Find(&data)
 
 	return data
 }
 
-func (r *Repository) Search(offset int, limit int, query string, data interface{}) interface{} {
+func (b repository) Search(offset int, limit int, query string, data interface{}) interface{} {
 	db.DBCon.Order("title asc").Limit(limit).Offset(offset).Where("title LIKE ?", "%"+query+"%").Find(&data)
 
 	return data
 }
 
-func (r *Repository) FindById(id int, data interface{}) interface{} {
+func (b repository) FindById(id int, data interface{}) interface{} {
 	db.DBCon.First(&data, id)
 
 	return data

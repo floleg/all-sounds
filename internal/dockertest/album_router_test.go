@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"allsounds/internal/router"
-	"allsounds/pkg/migration"
 	"allsounds/pkg/model"
 )
 
@@ -71,29 +70,30 @@ func TestAlbumByIdWithString(t *testing.T) {
 }
 
 func TestAlbumById(t *testing.T) {
-	album := migration.InsertAlbum("Album Title 1")
-
 	router := router.NewRouter()
 
 	w := httptest.NewRecorder()
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/album/%v", album.ID), nil)
+	// First search in album list to retreieve an actual album id
+	findAllReq, _ := http.NewRequest("GET", "/album?offset=0&limit=1", nil)
+	router.ServeHTTP(w, findAllReq)
+	albums := []model.Album{}
+	json.NewDecoder(w.Body).Decode(&albums)
+
+	// Fetch single album with previously retrieved id
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/album/%v", albums[0].ID), nil)
 	router.ServeHTTP(w, req)
 
-	data := model.Album{}
+	album := model.Album{}
 
 	if w.Code != 200 {
 		t.Errorf("got %v, want %v", w.Code, 200)
 	}
 
-	json.NewDecoder(w.Body).Decode(&data)
+	json.NewDecoder(w.Body).Decode(&album)
 
-	if album.ID != data.ID {
-		t.Errorf("got %v, want %v", data.ID, album.ID)
-	}
-
-	if album.Title != data.Title {
-		t.Errorf("got %v, want %v", data.Title, album.Title)
+	if len(album.Tracks) != 10 {
+		t.Errorf("got %v, want %v", len(album.Tracks), 10)
 	}
 }
 
