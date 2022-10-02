@@ -26,8 +26,3 @@ type Track struct {
 	Users    []User  `gorm:"many2many:user_tracks;" faker:"-"`
 	Albums   []Album `gorm:"many2many:album_tracks;" faker:"-"`
 }
-
-type Artist struct {
-	Entity
-	Name string
-}

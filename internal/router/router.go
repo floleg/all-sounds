@@ -11,11 +11,15 @@ func NewRouter() *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	album := new(controller.AlbumController)
-
 	// Album entity routes declarations
+	album := new(controller.AlbumController)
 	router.GET("/album", album.Search)
-	router.GET("/album/:id", album.GetAlbumById)
+	router.GET("/album/:id", album.GetById)
+
+	// Artist entity routes declarations
+	artist := new(controller.ArtistController)
+	router.GET("/artist", artist.Search)
+	router.GET("/artist/:id", artist.GetById)
 
 	return router
 }

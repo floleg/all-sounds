@@ -12,11 +12,11 @@ import (
 )
 
 // Without offset or limit url parameters, endpoint will return 400
-func TestFindAllWithoutPagination(t *testing.T) {
+func TestFindAllArtistsWithoutPagination(t *testing.T) {
 	router := router.NewRouter()
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/album", nil)
+	req, _ := http.NewRequest("GET", "/artist", nil)
 	router.ServeHTTP(w, req)
 
 	if w.Code != 400 {
@@ -29,30 +29,30 @@ func TestFindAllWithoutPagination(t *testing.T) {
 }
 
 // Test endpoint pagination
-func TestFindAll(t *testing.T) {
+func TestFindAllArtists(t *testing.T) {
 	router := router.NewRouter()
 
 	w := httptest.NewRecorder()
 
-	for i := 0; i <= 9; i += 10 {
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/album?offset=%v&limit=10", i), nil)
+	for i := 0; i <= 1; i += 1 {
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/artist?offset=%v&limit=10", i), nil)
 		router.ServeHTTP(w, req)
 
 		if w.Code != 200 {
 			t.Errorf("got %v, want %v", w.Code, 200)
 		}
 
-		data := []model.Album{}
+		data := []model.Artist{}
 		json.NewDecoder(w.Body).Decode(&data)
 
-		if len(data) != 10 {
-			t.Errorf("got %v, want %v", len(data), 10)
+		if len(data) != 1 {
+			t.Errorf("got %v, want %v", len(data), 1)
 		}
 	}
 }
 
 // Two cases: integer parameter and string parameter
-func TestAlbumById(t *testing.T) {
+func TestArtistById(t *testing.T) {
 	var tests = []struct {
 		name  string
 		panic bool
@@ -67,32 +67,28 @@ func TestAlbumById(t *testing.T) {
 		testname := fmt.Sprintf("%s", tt.name)
 		t.Run(testname, func(t *testing.T) {
 			if tt.name == "int" {
-				// First search in album list to retreieve an actual album id
-				findAllReq, _ := http.NewRequest("GET", "/album?offset=0&limit=1", nil)
+				// First search in artist list to retreieve an actual artist id
+				findAllReq, _ := http.NewRequest("GET", "/artist?offset=0&limit=1", nil)
 
 				w := httptest.NewRecorder()
 
 				router.ServeHTTP(w, findAllReq)
-				albums := []model.Album{}
-				json.NewDecoder(w.Body).Decode(&albums)
+				artists := []model.Artist{}
+				json.NewDecoder(w.Body).Decode(&artists)
 
-				// Fetch single album with previously retrieved id
-				req, _ := http.NewRequest("GET", fmt.Sprintf("/album/%v", albums[0].ID), nil)
+				// Fetch single artist with previously retrieved id
+				req, _ := http.NewRequest("GET", fmt.Sprintf("/artist/%v", artists[0].ID), nil)
 				router.ServeHTTP(w, req)
 
-				album := model.Album{}
+				artist := model.Artist{}
 
 				if w.Code != 200 {
 					t.Errorf("got %v, want %v", w.Code, 200)
 				}
 
-				json.NewDecoder(w.Body).Decode(&album)
-
-				if len(album.Tracks) != 10 {
-					t.Errorf("got %v, want %v", len(album.Tracks), 10)
-				}
+				json.NewDecoder(w.Body).Decode(&artist)
 			} else {
-				req, _ := http.NewRequest("GET", "/album/misguided-id", nil)
+				req, _ := http.NewRequest("GET", "/artist/misguided-id", nil)
 
 				w := httptest.NewRecorder()
 
@@ -111,16 +107,16 @@ func TestAlbumById(t *testing.T) {
 
 }
 
-func TestSearch(t *testing.T) {
+func TestSearchArtist(t *testing.T) {
 	router := router.NewRouter()
 
 	// we assume that the following
 	query := "accusantium"
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/album?query=%s&offset=0&limit=10", query), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/artist?query=%s&offset=0&limit=10", query), nil)
 	router.ServeHTTP(w, req)
 
-	data := []model.Album{}
+	data := []model.Artist{}
 	json.NewDecoder(w.Body).Decode(&data)
 
 	if len(data) != 10 {

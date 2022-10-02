@@ -6,7 +6,7 @@ import (
 )
 
 type AlbumRepository struct {
-	BaseRepo repository
+	BaseRepo Repository
 }
 
 // Retrieve Album by id, eager loading AlbumTracks associations
