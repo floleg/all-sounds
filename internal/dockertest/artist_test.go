@@ -87,6 +87,10 @@ func TestArtistById(t *testing.T) {
 				}
 
 				json.NewDecoder(w.Body).Decode(&artist)
+
+				if len(artist.Tracks) == 0 {
+					t.Errorf("got %v, want an inflated slice", len(artist.Tracks))
+				}
 			} else {
 				req, _ := http.NewRequest("GET", "/artist/misguided-id", nil)
 

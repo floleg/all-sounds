@@ -2,5 +2,6 @@ package model
 
 type Artist struct {
 	Entity
-	Name string
+	Name   string
+	Tracks []Track
 }

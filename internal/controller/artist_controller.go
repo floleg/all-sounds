@@ -52,7 +52,7 @@ func (a ArtistController) GetById(c *gin.Context) {
 	}
 
 	var data model.Artist
-	artist := artistRepository.FindById(id, data)
+	artist, err := artistRepository.FindById(id, data)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
