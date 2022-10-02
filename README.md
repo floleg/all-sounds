@@ -14,7 +14,7 @@ A few tools can be useful to build, run, and test this application:
 
 ### Database
 
-The relation DB system chosen for this solution is postgresql, run as a docker container.
+The relational DB system chosen for this solution is postgresql, run as a docker container.
 
 ### Libraries
 
