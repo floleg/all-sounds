@@ -35,8 +35,8 @@ func TestFindAllUsers(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	for i := 0; i <= 100; i += 10 {
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/user?offset=%v&limit=10", i), nil)
+	for i := 0; i <= 5; i += 1 {
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/user?offset=%v&limit=2", i), nil)
 		router.ServeHTTP(w, req)
 
 		if w.Code != 200 {
@@ -46,8 +46,8 @@ func TestFindAllUsers(t *testing.T) {
 		data := []model.User{}
 		json.NewDecoder(w.Body).Decode(&data)
 
-		if len(data) != 10 {
-			t.Errorf("got %v, want %v", len(data), 10)
+		if len(data) != 2 {
+			t.Errorf("got %v, want %v", len(data), 2)
 		}
 	}
 }
