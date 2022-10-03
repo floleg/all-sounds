@@ -1,7 +1,5 @@
 # all-sounds
-Hi Deezer people, I'm Florent! This a proposition of a Go implementation for the REST API exercise.
-
-<!-- ----------------------------------------------------------------------------------------------- -->
+Hi Deezer people, I'm Florent! This a proposition of a Go implementation for the REST API exercise. I hope you'll like it!
 
 ## Requirements
 
