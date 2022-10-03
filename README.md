@@ -43,4 +43,4 @@ Due to understandable tme constraint, some server components and software implem
 
 Here's the relational schema used to store the API data, entirely defined with Gorm entities as declared in the [model](https://gorm.io/docs/migration.html#Auto-Migration) package and persisted on server startup with [auto migrate](https://gorm.io/docs/migration.html#Auto-Migration) feature.
 
-![all-sound relations schema!](/assets/all-sounds.png "San Juan Mountains")
+![all-sound relations schema!](/assets/images/all-sounds.png "San Juan Mountains")
