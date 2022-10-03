@@ -8,7 +8,7 @@ Hi Deezer people, I'm Florent! This a proposition of a Go implementation for the
 A few tools can be useful to build, run, and test this application: 
 - [go 1.19](https://go.dev/doc/install) to buil the sources;
 - [docker](https://docs.docker.com/get-started/) and [docker-compose](https://docs.docker.com/compose/) to run the stack in containers;
-- [curl](https://curl.se/docs/manpage.html) to consume our API endpoints;
+- [curl](https://curl.se/docs/manpage.html) to consume / test our API endpoints;
 - [jq](https://stedolan.github.io/jq/) to get nicely formatted json responses.
 
 ## Toolchain
@@ -35,10 +35,120 @@ Due to understandable tme constraint, some server components and software implem
 
 **Logging / Observability** has to be improved on all levels. Here we're just redirecting runtime informations on the console output. A proper way to do it would be either using elastic search alongside with Kibana or Grafana's Loki and Fluentd.
 
-## Implementation
+**Swagger** annotations should be added to the code in order to auto generate the API documentation. Don't worry, we'll document the endpoints further away.
 
-### Relation schema
+## Relation schema
 
 Here's the relational schema used to store the API data, entirely defined with Gorm entities as declared in the [model](https://gorm.io/docs/migration.html#Auto-Migration) package and persisted on server startup with [auto migrate](https://gorm.io/docs/migration.html#Auto-Migration) feature.
 
 <img src="./assets/images/all-sounds.png" width="1000" height="500">
+
+## Run it!
+
+### With docker compose
+
+The compose file contained in this features two services:
+- **db**: the postgresql db container;
+- **server**: the Go API server container, based on the root Dockerfile of this project.
+
+To get the stack up and running, simply run:
+`➜  ~ docker-compose up`
+
+### As a standalone application
+
+If you wish to start the application server in Go native mode, simply:
+`➜  ~ ENV=dev go run ./cmd/server`
+
+Note that the `ENV` must be set to load a specific config file to interact with the database outside the docker created subnet. Obviously, a postgresql instance must be running in order to get a functional API server.
+
+## Test it!
+
+We mentioned earlier that some implementations have been omitted, still this application server is fully functional and ready to serve our API endpoints. Here's how to use them!
+
+### Artist
+
+`all-sounds` provides a few generic endpoints to read the artists records.
+
+<details>
+  <summary>GET /artist - Returns a list of artists.</summary>
+
+Query parameters:
+- `offset`: mandatory - Sets the offset in the select query;
+- `limit`: mandatory -  Set the fetched records limit in the select query;
+- `query`: optional - A free text field compared to the `name` column.
+
+```
+➜  ~ curl -s http://127.0.0.1:8080/artist\?offset\=0\&limit\=10 | jq
+[
+  {
+    "ID": 1,
+    "CreatedAt": "2022-10-03T09:54:57.562Z",
+    "UpdatedAt": "2022-10-03T09:54:59.128Z",
+    "DeletedAt": null,
+    "Name": "Artist One",
+    "Tracks": null
+  },
+  {
+    "ID": 2,
+    "CreatedAt": "2022-10-03T09:54:57.562Z",
+    "UpdatedAt": "2022-10-03T09:54:59.128Z",
+    "DeletedAt": null,
+    "Name": "Artist Two",
+    "Tracks": null
+  }
+]
+
+```
+
+```
+➜  ~ curl -s http://127.0.0.1:8080/artist\?query\=One\&offset\=0\&limit\=10 | jq
+[
+  {
+    "ID": 1,
+    "CreatedAt": "2022-10-03T09:54:57.562Z",
+    "UpdatedAt": "2022-10-03T09:54:59.128Z",
+    "DeletedAt": null,
+    "Name": "Artist One",
+    "Tracks": null
+  }
+]
+
+```
+</details>
+
+<details>
+  <summary>GET /artist/1 - Returns a single artist containing associated tracks, based on its unique id</summary>
+
+```
+➜  ~ curl -s http://127.0.0.1:8080/artist/1 | jq
+{
+  "ID": 1,
+  "CreatedAt": "2022-10-03T09:54:57.562Z",
+  "UpdatedAt": "2022-10-03T09:54:59.128Z",
+  "DeletedAt": null,
+  "Name": "Artist One",
+  "Tracks": [
+    {
+      "ID": 1,
+      "CreatedAt": "2022-10-03T10:22:55.079Z",
+      "UpdatedAt": "2022-10-03T10:22:56.58Z",
+      "DeletedAt": null,
+      "Title": "Track One",
+      "ArtistID": 1,
+      "Users": null,
+      "Albums": null
+    },
+    {
+      "ID": 2,
+      "CreatedAt": "2022-10-03T10:22:55.079Z",
+      "UpdatedAt": "2022-10-03T10:22:56.58Z",
+      "DeletedAt": null,
+      "Title": "Track Two",
+      "ArtistID": 1,
+      "Users": null,
+      "Albums": null
+    }
+  ]
+}
+```
+</details>
