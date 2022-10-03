@@ -33,9 +33,7 @@ Due to understandable tme constraint, some server components and software implem
 
 **Rate limiting** should be implemented on the router layer, despite the fact that gin doesn't provide such feature natively, but I might be wrong on this one.
 
-**Logging / Observability** has to be improved on all levels. Here we're just redirecting runtime informations on the console output. A proper way to do it would be either using elastic search aloginside with Kibana or Grafana's Loki and Fluentd.
-
-**Monitoring** can be easily setup with the combination of prometheus, node exporter and Grafana.
+**Logging / Observability** has to be improved on all levels. Here we're just redirecting runtime informations on the console output. A proper way to do it would be either using elastic search alongside with Kibana or Grafana's Loki and Fluentd.
 
 ## Implementation
 
@@ -43,4 +41,4 @@ Due to understandable tme constraint, some server components and software implem
 
 Here's the relational schema used to store the API data, entirely defined with Gorm entities as declared in the [model](https://gorm.io/docs/migration.html#Auto-Migration) package and persisted on server startup with [auto migrate](https://gorm.io/docs/migration.html#Auto-Migration) feature.
 
-![all-sound relations schema!](/assets/images/all-sounds.png "Relational schema")
+<img src="./assets/images/all-sounds.png" width="1000" height="500">
