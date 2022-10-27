@@ -11,18 +11,24 @@ import (
 
 func main() {
 	// Retrieve configuration based on ENV system variable
-	config, err := config.LoadConfig(os.Getenv("ENV"), "./configs")
+	appConfig, err := config.LoadConfig(os.Getenv("ENV"), "./configs")
 	if err != nil {
 		log.Fatal("cannot load config:", err)
 	}
 
 	// Open postgres connection
-	db.Init(&config)
+	err = db.Init(&appConfig)
+	if err != nil {
+		log.Fatal("cannot initiate db connection:", err)
+	}
 
 	// Run initial SQL migrations
 	migration.CreateTables()
 
 	// Instantiate gin router
-	router := router.NewRouter()
-	router.Run("0.0.0.0:8080")
+	appRouter := router.NewRouter()
+	err = appRouter.Run("0.0.0.0:8080")
+	if err != nil {
+		log.Fatal("cannot initiate db connection:", err)
+	}
 }
