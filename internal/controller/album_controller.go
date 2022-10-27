@@ -3,6 +3,7 @@ package controller
 import (
 	"allsounds/pkg/model"
 	"allsounds/pkg/repository"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
 
@@ -13,20 +14,28 @@ type AlbumController struct{}
 
 var albumRepository = new(repository.AlbumRepository)
 
-// getAlbums responds with the list of all albums as JSON.
+// Search getAlbums responds with the list of all albums as JSON.
 func (a AlbumController) Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msg("Bad request: missing offset or limit parameter")
 		return
 	}
 
 	offset, err := strconv.Atoi(c.Query("offset"))
-	limit, err := strconv.Atoi(c.Query("limit"))
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msg("Bad request: invalid offset parameter")
+		return
+	}
+
+	limit, err := strconv.Atoi(c.Query("limit"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		c.Abort()
+		log.Warn().Msg("Bad request: invalid limit parameter")
 		return
 	}
 
@@ -41,22 +50,23 @@ func (a AlbumController) Search(c *gin.Context) {
 	}
 }
 
-// getAlbums responds with a single album as JSON.
+// GetById responds with a single album as JSON.
 func (a AlbumController) GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msg("Bad request: missing id parameter")
 		return
 	}
 
 	var data model.Album
-	album, err := albumRepository.FindById(id, data)
 
+	album, err := albumRepository.FindById(id, data)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msg("Bad request: missing offset or limit parameter")
 		return
 	}
 

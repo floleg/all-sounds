@@ -4,6 +4,7 @@ import (
 	"allsounds/pkg/db"
 	"allsounds/pkg/model"
 	"allsounds/pkg/repository"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
 
@@ -14,20 +15,28 @@ type UserController struct{}
 
 var userRepository = new(repository.UserRepository)
 
-// responds with the list of all artists as JSON.
+// Search responds with the list of all artists as JSON.
 func (u UserController) Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msg("Bad request: missing offset or limit parameter")
 		return
 	}
 
 	offset, err := strconv.Atoi(c.Query("offset"))
-	limit, err := strconv.Atoi(c.Query("limit"))
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msg("Bad request: invalid offset parameter")
+		return
+	}
+
+	limit, err := strconv.Atoi(c.Query("limit"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		c.Abort()
+		log.Warn().Msg("Bad request: invalid limit parameter")
 		return
 	}
 
@@ -42,13 +51,14 @@ func (u UserController) Search(c *gin.Context) {
 	}
 }
 
-// responds with a single artist as JSON.
+// GetById responds with a single artist as JSON.
 func (u UserController) GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msg("Bad request: invalid id parameter")
 		return
 	}
 
@@ -58,20 +68,28 @@ func (u UserController) GetById(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msgf("Bad request: can't fetch User entity with id %s", id)
 		return
 	}
 
 	c.IndentedJSON(http.StatusOK, user)
 }
 
-// responds with a single artist as JSON.
+// AppendUserTrack responds with a single user as JSON.
 func (u UserController) AppendUserTrack(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("userId"))
-	trackId, err := strconv.Atoi(c.Param("trackId"))
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msg("Bad request: invalid userId parameter")
+		return
+	}
+
+	trackId, err := strconv.Atoi(c.Param("trackId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		c.Abort()
+		log.Warn().Msg("Bad request: invalid trackId parameter")
 		return
 	}
 
@@ -84,14 +102,6 @@ func (u UserController) AppendUserTrack(c *gin.Context) {
 	user.Tracks = append(user.Tracks, track)
 
 	db.DBCon.Omit("Track").Save(&user)
-
-	// err = userRepository.AppendUserTrack(&user, &track)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
-		c.Abort()
-		return
-	}
 
 	c.IndentedJSON(http.StatusOK, user)
 }
