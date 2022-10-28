@@ -56,7 +56,7 @@ func (a AlbumController) GetById(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
-		log.Warn().Msg("Bad request: missing id parameter")
+		log.Warn().Msg("Bad request: invalid id parameter")
 		return
 	}
 
@@ -66,7 +66,7 @@ func (a AlbumController) GetById(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
-		log.Warn().Msg("Bad request: missing offset or limit parameter")
+		log.Warn().Msgf("Bad request: can't fetch Album entity with id %s", id)
 		return
 	}
 
