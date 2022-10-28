@@ -67,7 +67,7 @@ func (t TrackController) GetById(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
-		log.Warn().Msgf("request: can't fetch Track entity with id %s", id)
+		log.Warn().Msgf("request: can't fetch Track entity with id %v", id)
 
 		return
 	}
