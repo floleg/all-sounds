@@ -13,11 +13,11 @@ import (
 
 // Without offset or limit url parameters, endpoint will return 400
 func TestFindAllAlbumsWithoutPagination(t *testing.T) {
-	router := router.NewRouter()
+	testRouter := router.NewRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/album", nil)
-	router.ServeHTTP(w, req)
+	testRouter.ServeHTTP(w, req)
 
 	if w.Code != 400 {
 		t.Errorf("got %v, want %v", w.Code, 400)
@@ -30,13 +30,13 @@ func TestFindAllAlbumsWithoutPagination(t *testing.T) {
 
 // Test endpoint pagination
 func TestFindAllAlbums(t *testing.T) {
-	router := router.NewRouter()
+	testRouter := router.NewRouter()
 
 	w := httptest.NewRecorder()
 
 	for i := 0; i <= 9; i += 10 {
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/album?offset=%v&limit=10", i), nil)
-		router.ServeHTTP(w, req)
+		testRouter.ServeHTTP(w, req)
 
 		if w.Code != 200 {
 			t.Errorf("got %v, want %v", w.Code, 200)
@@ -61,24 +61,23 @@ func TestAlbumById(t *testing.T) {
 		{name: "string"},
 	}
 
-	router := router.NewRouter()
+	testRouter := router.NewRouter()
 
 	for _, tt := range tests {
-		testname := fmt.Sprintf("%s", tt.name)
-		t.Run(testname, func(t *testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
 			if tt.name == "int" {
 				// First search in album list to retreieve an actual album id
 				findAllReq, _ := http.NewRequest("GET", "/album?offset=0&limit=1", nil)
 
 				w := httptest.NewRecorder()
 
-				router.ServeHTTP(w, findAllReq)
+				testRouter.ServeHTTP(w, findAllReq)
 				albums := []model.Album{}
 				json.NewDecoder(w.Body).Decode(&albums)
 
 				// Fetch single album with previously retrieved id
 				req, _ := http.NewRequest("GET", fmt.Sprintf("/album/%v", albums[0].ID), nil)
-				router.ServeHTTP(w, req)
+				testRouter.ServeHTTP(w, req)
 
 				album := model.Album{}
 
@@ -96,7 +95,7 @@ func TestAlbumById(t *testing.T) {
 
 				w := httptest.NewRecorder()
 
-				router.ServeHTTP(w, req)
+				testRouter.ServeHTTP(w, req)
 
 				if w.Code != 400 {
 					t.Errorf("got %v, want %v", w.Code, 400)
