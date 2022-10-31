@@ -125,7 +125,7 @@ func TestSearchUser(t *testing.T) {
 func TestAppendUserTrack(t *testing.T) {
 	testRouter := router.NewRouter()
 
-	// First search in user list to retreieve an actual user id
+	// First search in user list to retrieve an actual user id
 	findUsersReq, _ := http.NewRequest("GET", "/user?offset=0&limit=1", nil)
 
 	w := httptest.NewRecorder()

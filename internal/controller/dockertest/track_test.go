@@ -71,7 +71,7 @@ func TestTrackById(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.name == "int" {
-				// First search in track list to retreieve an actual track id
+				// First search in track list to retrieve an actual track id
 				findAllReq, _ := http.NewRequest("GET", "/track?offset=0&limit=1", nil)
 
 				w := httptest.NewRecorder()

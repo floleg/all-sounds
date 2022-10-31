@@ -66,7 +66,7 @@ func TestArtistById(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.name == "int" {
-				// First search in artist list to retreieve an actual artist id
+				// First search in artist list to retrieve an actual artist id
 				findAllReq, _ := http.NewRequest("GET", "/artist?offset=0&limit=1", nil)
 
 				w := httptest.NewRecorder()
