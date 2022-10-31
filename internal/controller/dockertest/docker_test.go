@@ -51,15 +51,18 @@ func setup() {
 		}
 	}
 
-	testConfig := config.Config{DBHost: "localhost", DBPort: resource.GetPort("5432/tcp"), DBName: dbName, DBUSer: "postgres", DBPassword: dbPasswd}
+	testConfig := config.Config{
+		DBHost:     "localhost",
+		DBPort:     resource.GetPort("5432/tcp"),
+		DBName:     dbName,
+		DBUSer:     "postgres",
+		DBPassword: dbPasswd,
+	}
 
 	// retry until db server is ready
 	pool.MaxWait = 60 * time.Second
 	if err = pool.Retry(func() error {
 		err = db.Init(&testConfig)
-		if err != nil {
-			log.Fatal().Err(err).Msg("cannot initiate db connection")
-		}
 		gdb, err := db.DBCon.DB()
 		if err != nil {
 			return err
@@ -70,7 +73,7 @@ func setup() {
 	}
 
 	if err != nil {
-		panic(err)
+		log.Fatal().Err(err)
 	}
 }
 
