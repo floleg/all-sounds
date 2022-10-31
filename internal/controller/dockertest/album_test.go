@@ -42,8 +42,11 @@ func TestFindAllAlbums(t *testing.T) {
 			t.Errorf("got %v, want %v", w.Code, 200)
 		}
 
-		data := []model.Album{}
-		json.NewDecoder(w.Body).Decode(&data)
+		var data []model.Album
+		err := json.NewDecoder(w.Body).Decode(&data)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
 
 		if len(data) != 10 {
 			t.Errorf("got %v, want %v", len(data), 10)
@@ -66,14 +69,17 @@ func TestAlbumById(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.name == "int" {
-				// First search in album list to retreieve an actual album id
+				// First search in album list to retrieve an actual album id
 				findAllReq, _ := http.NewRequest("GET", "/album?offset=0&limit=1", nil)
 
 				w := httptest.NewRecorder()
 
 				testRouter.ServeHTTP(w, findAllReq)
 				albums := []model.Album{}
-				json.NewDecoder(w.Body).Decode(&albums)
+				err := json.NewDecoder(w.Body).Decode(&albums)
+				if err != nil {
+					t.Errorf(err.Error())
+				}
 
 				// Fetch single album with previously retrieved id
 				req, _ := http.NewRequest("GET", fmt.Sprintf("/album/%v", albums[0].ID), nil)
@@ -85,7 +91,10 @@ func TestAlbumById(t *testing.T) {
 					t.Errorf("got %v, want %v", w.Code, 200)
 				}
 
-				json.NewDecoder(w.Body).Decode(&album)
+				err = json.NewDecoder(w.Body).Decode(&album)
+				if err != nil {
+					t.Errorf(err.Error())
+				}
 
 				if len(album.Tracks) != 10 {
 					t.Errorf("got %v, want %v", len(album.Tracks), 10)
@@ -107,19 +116,21 @@ func TestAlbumById(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestAlbumsSearch(t *testing.T) {
-	router := router.NewRouter()
+	testRouter := router.NewRouter()
 
 	query := "accusantium"
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/album?query=%s&offset=0&limit=10", query), nil)
-	router.ServeHTTP(w, req)
+	testRouter.ServeHTTP(w, req)
 
-	data := []model.Album{}
-	json.NewDecoder(w.Body).Decode(&data)
+	var data []model.Album
+	err := json.NewDecoder(w.Body).Decode(&data)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
 	if len(data) != 10 {
 		t.Errorf("got %v, want %v", len(data), 10)

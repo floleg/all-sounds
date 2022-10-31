@@ -3,16 +3,19 @@ package migration
 import (
 	"allsounds/pkg/db"
 	"allsounds/pkg/model"
-
 	"github.com/bxcodec/faker/v4"
+	"github.com/rs/zerolog/log"
 )
 
 func BulkInsertArtists(number int) []*model.Artist {
-	var artists = []*model.Artist{}
+	var artists []*model.Artist
 
 	for i := 1; i <= number; i++ {
 		artist := model.Artist{}
-		faker.FakeData(&artist)
+		err := faker.FakeData(&artist)
+		if err != nil {
+			log.Err(err)
+		}
 		artists = append(artists, &artist)
 	}
 
@@ -22,16 +25,23 @@ func BulkInsertArtists(number int) []*model.Artist {
 }
 
 func BulkInsertAlbums(artists []*model.Artist, number int) []*model.Album {
-	var albums = []*model.Album{}
+	var albums []*model.Album
 
 	for _, artist := range artists {
 		for i := 1; i <= number; i++ {
 			album := model.Album{}
-			faker.FakeData(&album)
+			err := faker.FakeData(&album)
+			if err != nil {
+				log.Err(err)
+			}
 
 			for i := 1; i <= number; i++ {
 				track := model.Track{}
-				faker.FakeData(&track)
+				err = faker.FakeData(&track)
+				if err != nil {
+					log.Err(err)
+				}
+
 				track.ArtistID = artist.ID
 				album.Tracks = append(album.Tracks, track)
 			}
@@ -46,11 +56,14 @@ func BulkInsertAlbums(artists []*model.Artist, number int) []*model.Album {
 }
 
 func BulkInsertUsers(number int) []model.User {
-	var users = []model.User{}
+	var users []model.User
 
 	for i := 0; i < number; i++ {
 		user := model.User{}
-		faker.FakeData(&user)
+		err := faker.FakeData(&user)
+		if err != nil {
+			log.Err(err)
+		}
 		users = append(users, user)
 	}
 
