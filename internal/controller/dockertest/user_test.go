@@ -14,11 +14,11 @@ import (
 
 // Without offset or limit url parameters, endpoint will return 400
 func TestFindAllUsersWithoutPagination(t *testing.T) {
-	router := router.NewRouter()
+	testRouter := router.NewRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/user", nil)
-	router.ServeHTTP(w, req)
+	testRouter.ServeHTTP(w, req)
 
 	if w.Code != 400 {
 		t.Errorf("got %v, want %v", w.Code, 400)
@@ -31,13 +31,13 @@ func TestFindAllUsersWithoutPagination(t *testing.T) {
 
 // Test endpoint pagination
 func TestFindAllUsers(t *testing.T) {
-	router := router.NewRouter()
+	testRouter := router.NewRouter()
 
 	w := httptest.NewRecorder()
 
 	for i := 0; i <= 5; i += 1 {
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/user?offset=%v&limit=2", i), nil)
-		router.ServeHTTP(w, req)
+		testRouter.ServeHTTP(w, req)
 
 		if w.Code != 200 {
 			t.Errorf("got %v, want %v", w.Code, 200)
