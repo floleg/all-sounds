@@ -11,12 +11,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserController struct{}
+// User struct exports the controller business API methods
+// providing responses to the declared server's routes
+type User struct{}
 
 var userRepository = new(repository.UserRepository)
 
 // Search responds with the list of all artists as JSON.
-func (u UserController) Search(c *gin.Context) {
+func (u User) Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
@@ -52,7 +54,7 @@ func (u UserController) Search(c *gin.Context) {
 }
 
 // GetById responds with a single artist as JSON.
-func (u UserController) GetById(c *gin.Context) {
+func (u User) GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
@@ -76,7 +78,7 @@ func (u UserController) GetById(c *gin.Context) {
 }
 
 // AppendUserTrack responds with a single user as JSON.
-func (u UserController) AppendUserTrack(c *gin.Context) {
+func (u User) AppendUserTrack(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("userId"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})

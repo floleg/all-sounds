@@ -10,12 +10,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type TrackController struct{}
+// Artist struct exports the controller business API methods
+// providing responses to the declared server's routes
+type Artist struct{}
 
-var trackRepository = new(repository.TrackRepository)
+var artistRepository = new(repository.ArtistRepository)
 
 // Search responds with the list of all artists as JSON.
-func (t TrackController) Search(c *gin.Context) {
+func (a Artist) Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
@@ -39,19 +41,19 @@ func (t TrackController) Search(c *gin.Context) {
 		return
 	}
 
-	var data []model.Track
+	var data []model.Artist
 	// If a query string has been passed, search artists by title, else fetch all
 	if c.Query("query") != "" {
-		tracks := trackRepository.BaseRepo.Search(offset, limit, c.Query("query"), data, "title")
-		c.IndentedJSON(http.StatusOK, tracks)
+		artists := artistRepository.BaseRepo.Search(offset, limit, c.Query("query"), data, "name")
+		c.IndentedJSON(http.StatusOK, artists)
 	} else {
-		tracks := trackRepository.BaseRepo.FindAll(offset, limit, data, "title")
-		c.IndentedJSON(http.StatusOK, tracks)
+		artists := artistRepository.BaseRepo.FindAll(offset, limit, data, "name")
+		c.IndentedJSON(http.StatusOK, artists)
 	}
 }
 
 // GetById responds with a single artist as JSON.
-func (t TrackController) GetById(c *gin.Context) {
+func (a Artist) GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
@@ -61,16 +63,15 @@ func (t TrackController) GetById(c *gin.Context) {
 		return
 	}
 
-	var data model.Track
-	track, err := trackRepository.FindById(id, data)
+	var data model.Artist
+	artist, err := artistRepository.FindById(id, data)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
-		log.Warn().Msgf("request: can't fetch Track entity with id %v", id)
-
+		log.Warn().Msgf("Bad request: can't fetch Artist entity with id %v", id)
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, track)
+	c.IndentedJSON(http.StatusOK, artist)
 }
