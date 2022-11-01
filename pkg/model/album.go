@@ -1,3 +1,4 @@
+// Package model declares the gorm entities used by the API
 package model
 
 type Album struct {

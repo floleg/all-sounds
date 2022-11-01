@@ -1,3 +1,4 @@
+// Package db opens a gorm Postgres database connection
 package db
 
 import (

@@ -1,3 +1,6 @@
+// Package router instantiates a gin engine and
+// declares REST API routes, associating controller
+// layer business methods.
 package router
 
 import (

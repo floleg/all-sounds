@@ -1,3 +1,5 @@
+// Package controller implements methods associated
+// to the application declared http routes.
 package controller
 
 import (

@@ -1,3 +1,5 @@
+// Package dockertest implements end-to-end integration tests
+// on the http routes layer
 package dockertest
 
 import (

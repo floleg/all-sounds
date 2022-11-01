@@ -1,3 +1,5 @@
+// Package config parses the yaml configuration files
+// based on the runtime defined ENV variable.
 package config
 
 import (
