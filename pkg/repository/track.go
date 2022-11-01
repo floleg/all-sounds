@@ -5,6 +5,8 @@ import (
 	"allsounds/pkg/model"
 )
 
+// Track repository exposes gorm persistence methods
+// in order to interact with the track postgresql table.
 type Track struct {
 	BaseRepo Repository
 }

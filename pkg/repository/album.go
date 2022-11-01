@@ -7,6 +7,8 @@ import (
 	"allsounds/pkg/model"
 )
 
+// Album repository exposes gorm persistence methods
+// in order to interact with the album postgresql table.
 type Album struct {
 	BaseRepo Repository
 }

@@ -5,6 +5,8 @@ import (
 	"allsounds/pkg/model"
 )
 
+// User repository exposes gorm persistence methods
+// in order to interact with the user postgresql table.
 type User struct {
 	BaseRepo Repository
 }

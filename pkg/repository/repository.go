@@ -10,6 +10,10 @@ type BaseRepository interface {
 	Search(offset int, limit int, query string, data interface{}) interface{}
 }
 
+// Repository exposes generic gorm persistence methods:
+//   - FindAll
+//   - Search
+//   - FindById
 type Repository struct{}
 
 // FindAll performs a select query and returns an interface of the given data parameter, filtered with:
