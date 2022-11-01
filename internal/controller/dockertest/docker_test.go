@@ -77,6 +77,7 @@ func setup() {
 	}
 }
 
+// TestMain runs the whole dockertest package integration tests suite
 func TestMain(m *testing.M) {
 	setup()
 
