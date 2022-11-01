@@ -9,7 +9,7 @@ import (
 
 // BulkInsertArtists inserts a set of artists in the artist table
 // depending on the given number parameter.
-// Returns a slice of [all-sounds/model/artist].
+// Returns a slice of Artist.
 func BulkInsertArtists(number int) []*model.Artist {
 	var artists []*model.Artist
 
@@ -27,6 +27,9 @@ func BulkInsertArtists(number int) []*model.Artist {
 	return artists
 }
 
+// BulkInsertAlbums inserts a set of albums in the `album` table
+// depending on the given number parameter.
+// Returns a slice of Album.
 func BulkInsertAlbums(artists []*model.Artist, number int) []*model.Album {
 	var albums []*model.Album
 
@@ -58,6 +61,9 @@ func BulkInsertAlbums(artists []*model.Artist, number int) []*model.Album {
 	return albums
 }
 
+// BulkInsertUsers inserts a set of users in the `user` table
+// depending on the given number parameter.
+// Returns a slice of User.
 func BulkInsertUsers(number int) []model.User {
 	var users []model.User
 
