@@ -1,3 +1,4 @@
+// Package cmd/server is used to run the API server as a cli tool
 package main
 
 import (
