@@ -16,7 +16,7 @@ import (
 // providing responses to the declared server's routes
 type Album struct{}
 
-var albumRepository = new(repository.AlbumRepository)
+var albumRepository = new(repository.Album)
 
 // Search getAlbums responds with the list of all albums as JSON.
 func (a Album) Search(c *gin.Context) {

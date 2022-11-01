@@ -14,7 +14,7 @@ import (
 // providing responses to the declared server's routes
 type Artist struct{}
 
-var artistRepository = new(repository.ArtistRepository)
+var artistRepository = new(repository.Artist)
 
 // Search responds with the list of all artists as JSON.
 func (a Artist) Search(c *gin.Context) {

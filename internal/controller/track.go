@@ -14,7 +14,7 @@ import (
 // providing responses to the declared server's routes
 type Track struct{}
 
-var trackRepository = new(repository.TrackRepository)
+var trackRepository = new(repository.Track)
 
 // Search responds with the list of all artists as JSON.
 func (t Track) Search(c *gin.Context) {

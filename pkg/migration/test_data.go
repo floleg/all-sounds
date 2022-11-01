@@ -7,6 +7,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// BulkInsertArtists inserts a set of artists in the artist table
+// depending on the given number parameter.
+// Returns a slice of [all-sounds/model/artist].
 func BulkInsertArtists(number int) []*model.Artist {
 	var artists []*model.Artist
 

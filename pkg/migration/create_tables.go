@@ -8,6 +8,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// CreateTables uses gorm AutoMigrate feature to create the application SQL structure
+// based on [all-sounds/model] declared entities
 func CreateTables() {
 	err := db.DBCon.AutoMigrate(
 		&model.Album{},

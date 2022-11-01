@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// NewRouter instantiates and return a gin Engine router with its declared routes and controller methods
 func NewRouter() *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
