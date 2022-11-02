@@ -5,12 +5,17 @@ import (
 	"fmt"
 )
 
+// BaseRepository interface declares generic gorm persistence methods:
+//   - FindAll
+//   - Search
+//   - FindById
 type BaseRepository interface {
-	FindAll(offset int, limit int, data interface{}) interface{}
-	Search(offset int, limit int, query string, data interface{}) interface{}
+	FindAll(offset int, limit int, data interface{}, order string) interface{}
+	Search(offset int, limit int, query string, data interface{}, order string) interface{}
+	FindById(id int, data interface{}) *interface{}
 }
 
-// Repository exposes generic gorm persistence methods:
+// Repository implements and exposes generic gorm persistence methods:
 //   - FindAll
 //   - Search
 //   - FindById
