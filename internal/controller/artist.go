@@ -3,6 +3,7 @@ package controller
 import (
 	"allsounds/pkg/model"
 	"allsounds/pkg/repository"
+	"allsounds/pkg/repository/artist"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
@@ -13,8 +14,6 @@ import (
 // Artist struct exports the controller business API methods
 // providing responses to the declared server's routes
 type Artist struct{}
-
-var artistRepository = new(repository.Artist)
 
 // Search responds with the list of all artists as JSON.
 func (a Artist) Search(c *gin.Context) {
@@ -44,10 +43,10 @@ func (a Artist) Search(c *gin.Context) {
 	var data []model.Artist
 	// If a query string has been passed, search artists by title, else fetch all
 	if c.Query("query") != "" {
-		artists := artistRepository.BaseRepo.Search(offset, limit, c.Query("query"), data, "name")
+		artists := repository.Search(offset, limit, c.Query("query"), data, "name")
 		c.IndentedJSON(http.StatusOK, artists)
 	} else {
-		artists := artistRepository.BaseRepo.FindAll(offset, limit, data, "name")
+		artists := repository.FindAll(offset, limit, data, "name")
 		c.IndentedJSON(http.StatusOK, artists)
 	}
 }
@@ -64,7 +63,7 @@ func (a Artist) GetById(c *gin.Context) {
 	}
 
 	var data model.Artist
-	artist, err := artistRepository.FindById(id, data)
+	artist, err := artist.FindById(id, data)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})

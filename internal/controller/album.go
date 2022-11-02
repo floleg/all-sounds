@@ -5,6 +5,7 @@ package controller
 import (
 	"allsounds/pkg/model"
 	"allsounds/pkg/repository"
+	"allsounds/pkg/repository/album"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
@@ -15,8 +16,6 @@ import (
 // Album struct exports the controller business API methods
 // providing responses to the declared server's routes
 type Album struct{}
-
-var albumRepository = new(repository.Album)
 
 // Search getAlbums responds with the list of all albums as JSON.
 func (a Album) Search(c *gin.Context) {
@@ -46,10 +45,10 @@ func (a Album) Search(c *gin.Context) {
 	var data []model.Album
 	// If a query string has been passed, search albums by title, else fetch all
 	if c.Query("query") != "" {
-		albums := albumRepository.BaseRepo.Search(offset, limit, c.Query("query"), data, "title")
+		albums := repository.Search(offset, limit, c.Query("query"), data, "title")
 		c.IndentedJSON(http.StatusOK, albums)
 	} else {
-		albums := albumRepository.BaseRepo.FindAll(offset, limit, data, "title")
+		albums := repository.FindAll(offset, limit, data, "title")
 		c.IndentedJSON(http.StatusOK, albums)
 	}
 }
@@ -66,7 +65,7 @@ func (a Album) GetById(c *gin.Context) {
 
 	var data model.Album
 
-	album, err := albumRepository.FindById(id, data)
+	album, err := album.FindById(id, data)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
