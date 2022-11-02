@@ -6,8 +6,8 @@ import (
 )
 
 type BaseRepository interface {
-	FindAll(offset int, limit int, data interface{}) interface{}
-	Search(offset int, limit int, query string, data interface{}) interface{}
+	FindAll(offset int, limit int, data any) any
+	Search(offset int, limit int, query string, data any) any
 }
 
 // FindAll performs a select query and returns an interface of the given data parameter, filtered with:
@@ -15,7 +15,7 @@ type BaseRepository interface {
 //   - limit
 //
 // The results will be ordered based on the column name passed in the order parameter.
-func FindAll[T any](offset int, limit int, data T, order string) interface{} {
+func FindAll[T any](offset int, limit int, data T, order string) any {
 	db.DBCon.Order(fmt.Sprintf("%s asc", order)).Limit(limit).Offset(offset).Find(&data)
 
 	return data
@@ -27,7 +27,7 @@ func FindAll[T any](offset int, limit int, data T, order string) interface{} {
 //   - query: where clause
 //
 // The results will be ordered based on the column name passed in the order parameter.
-func Search[T any](offset int, limit int, query string, data T, order string) interface{} {
+func Search[T any](offset int, limit int, query string, data T, order string) any {
 	db.DBCon.Order(fmt.Sprintf("%s asc", order)).Limit(limit).Offset(offset).
 		Where(fmt.Sprintf("%s LIKE ?", order), "%"+query+"%").Find(&data)
 
