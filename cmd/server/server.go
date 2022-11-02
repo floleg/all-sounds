@@ -7,14 +7,13 @@ import (
 	"allsounds/pkg/db"
 	"allsounds/pkg/migration"
 	"github.com/rs/zerolog/log"
-	"os"
 )
 
 func main() {
 	// Retrieve configuration based on ENV system variable
-	appConfig, err := config.LoadConfig(os.Getenv("ENV"), "./configs")
+	appConfig, err := config.LoadConfig()
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to load config file")
+		log.Fatal().Err(err).Msg("failed to load config")
 	}
 
 	// Open postgres connection
