@@ -13,6 +13,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func AddRoutes(router *gin.Engine) *gin.Engine {
+	router.GET("/user", Search)
+	router.GET("/user/:id", GetById)
+	router.POST("/user/:userId/track/:trackId", AppendUserTrack)
+
+	return router
+}
+
 // Search responds with the list of all artists as JSON.
 func Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
@@ -61,7 +69,7 @@ func GetById(c *gin.Context) {
 	}
 
 	var data model.User
-	user, err := user.FindById(id, data)
+	err = user.FindById(id, &data)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
@@ -70,7 +78,7 @@ func GetById(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, user)
+	c.IndentedJSON(http.StatusOK, data)
 }
 
 // AppendUserTrack responds with a single user as JSON.
@@ -92,10 +100,10 @@ func AppendUserTrack(c *gin.Context) {
 	}
 
 	usr := model.User{}
-	user.FindById(userId, usr)
+	user.FindById(userId, &usr)
 
 	trk := model.Track{}
-	track.FindById(trackId, trk)
+	track.FindById(trackId, &trk)
 
 	usr.Tracks = append(usr.Tracks, trk)
 

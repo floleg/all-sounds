@@ -15,7 +15,7 @@ func main() {
 	}
 
 	// Open postgres connection
-	err = db.Init(&appConfig)
+	err = db.InitPostgresDB(&appConfig)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot initiate db connection")
 	}

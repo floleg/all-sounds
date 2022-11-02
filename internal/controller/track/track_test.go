@@ -1,24 +1,38 @@
-package dockertest
+package track
 
 import (
+	"allsounds/pkg/migration"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"allsounds/internal/router"
 	"allsounds/pkg/db"
 	"allsounds/pkg/model"
 )
 
+var router *gin.Engine
+
+func init() {
+	db.DBCon, _ = gorm.Open(sqlite.Open(":memory:"), nil)
+	migration.CreateTables()
+	artists := migration.BulkInsertArtists(2)
+	migration.BulkInsertAlbums(artists, 10)
+	migration.BulkInsertUsers(10)
+
+	router = gin.New()
+	AddRoutes(router)
+}
+
 // TestFindAllTracksWithoutPagination asserts that without offset or limit url parameters, endpoint will return 400
 func TestFindAllTracksWithoutPagination(t *testing.T) {
-	testRouter := router.NewRouter()
-
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/track", nil)
-	testRouter.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 
 	if w.Code != 400 {
 		t.Errorf("got %v, want %v", w.Code, 400)
@@ -31,13 +45,11 @@ func TestFindAllTracksWithoutPagination(t *testing.T) {
 
 // TestFindAllTracks validates endpoint pagination
 func TestFindAllTracks(t *testing.T) {
-	testRouter := router.NewRouter()
-
 	w := httptest.NewRecorder()
 
 	for i := 0; i <= 100; i += 10 {
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/track?offset=%v&limit=10", i), nil)
-		testRouter.ServeHTTP(w, req)
+		router.ServeHTTP(w, req)
 
 		if w.Code != 200 {
 			t.Errorf("got %v, want %v", w.Code, 200)
@@ -66,8 +78,6 @@ func TestTrackById(t *testing.T) {
 		{name: "string"},
 	}
 
-	testRouter := router.NewRouter()
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.name == "int" {
@@ -76,7 +86,7 @@ func TestTrackById(t *testing.T) {
 
 				w := httptest.NewRecorder()
 
-				testRouter.ServeHTTP(w, findAllReq)
+				router.ServeHTTP(w, findAllReq)
 
 				var tracks []model.Track
 				err := json.NewDecoder(w.Body).Decode(&tracks)
@@ -96,7 +106,7 @@ func TestTrackById(t *testing.T) {
 
 				w := httptest.NewRecorder()
 
-				testRouter.ServeHTTP(w, req)
+				router.ServeHTTP(w, req)
 
 				if w.Code != 400 {
 					t.Errorf("got %v, want %v", w.Code, 400)
@@ -113,12 +123,10 @@ func TestTrackById(t *testing.T) {
 
 // TestTrackSearch validates the search endpoint
 func TestTrackSearch(t *testing.T) {
-	testRouter := router.NewRouter()
-
 	query := ""
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/track?query=%s&offset=0&limit=10", query), nil)
-	testRouter.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 
 	var data []model.Track
 	err := json.NewDecoder(w.Body).Decode(&data)

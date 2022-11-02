@@ -13,6 +13,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func AddRoutes(router *gin.Engine) *gin.Engine {
+	router.GET("/album", Search)
+	router.GET("/album/:id", GetById)
+
+	return router
+}
+
 // Search getAlbums responds with the list of all albums as JSON.
 func Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {

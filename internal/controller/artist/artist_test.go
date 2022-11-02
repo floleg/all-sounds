@@ -1,23 +1,38 @@
-package dockertest
+package artist
 
 import (
+	"allsounds/pkg/db"
+	"allsounds/pkg/migration"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"allsounds/internal/router"
 	"allsounds/pkg/model"
 )
 
+var router *gin.Engine
+
+func init() {
+	db.DBCon, _ = gorm.Open(sqlite.Open(":memory:"), nil)
+	migration.CreateTables()
+	artists := migration.BulkInsertArtists(2)
+	migration.BulkInsertAlbums(artists, 10)
+	migration.BulkInsertUsers(10)
+
+	router = gin.New()
+	AddRoutes(router)
+}
+
 // TestFindAllArtistsWithoutPagination asserts that without offset or limit url parameters, endpoint will return 400
 func TestFindAllArtistsWithoutPagination(t *testing.T) {
-	testRouter := router.NewRouter()
-
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/artist", nil)
-	testRouter.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 
 	if w.Code != 400 {
 		t.Errorf("got %v, want %v", w.Code, 400)
@@ -30,13 +45,11 @@ func TestFindAllArtistsWithoutPagination(t *testing.T) {
 
 // TestFindAllArtists validates endpoint pagination
 func TestFindAllArtists(t *testing.T) {
-	testRouter := router.NewRouter()
-
 	w := httptest.NewRecorder()
 
 	for i := 0; i <= 1; i += 1 {
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/artist?offset=%v&limit=1", i), nil)
-		testRouter.ServeHTTP(w, req)
+		router.ServeHTTP(w, req)
 
 		if w.Code != 200 {
 			t.Errorf("got %v, want %v", w.Code, 200)
@@ -61,8 +74,6 @@ func TestArtistById(t *testing.T) {
 		{name: "string"},
 	}
 
-	testRouter := router.NewRouter()
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.name == "int" {
@@ -71,7 +82,7 @@ func TestArtistById(t *testing.T) {
 
 				w := httptest.NewRecorder()
 
-				testRouter.ServeHTTP(w, findAllReq)
+				router.ServeHTTP(w, findAllReq)
 				var artists []model.Artist
 				err := json.NewDecoder(w.Body).Decode(&artists)
 				if err != nil {
@@ -80,7 +91,7 @@ func TestArtistById(t *testing.T) {
 
 				// Fetch single artist with previously retrieved id
 				req, _ := http.NewRequest("GET", fmt.Sprintf("/artist/%v", artists[0].ID), nil)
-				testRouter.ServeHTTP(w, req)
+				router.ServeHTTP(w, req)
 
 				artist := model.Artist{}
 
@@ -101,7 +112,7 @@ func TestArtistById(t *testing.T) {
 
 				w := httptest.NewRecorder()
 
-				testRouter.ServeHTTP(w, req)
+				router.ServeHTTP(w, req)
 
 				if w.Code != 400 {
 					t.Errorf("got %v, want %v", w.Code, 400)
@@ -118,12 +129,10 @@ func TestArtistById(t *testing.T) {
 
 // TestArtistSearch validates the search endpoint
 func TestArtistSearch(t *testing.T) {
-	testRouter := router.NewRouter()
-
 	query := ""
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/artist?query=%s&offset=0&limit=10", query), nil)
-	testRouter.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 
 	var data []model.Artist
 	err := json.NewDecoder(w.Body).Decode(&data)

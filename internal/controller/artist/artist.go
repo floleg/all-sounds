@@ -11,6 +11,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func AddRoutes(router *gin.Engine) *gin.Engine {
+	router.GET("/artist", Search)
+	router.GET("/artist/:id", GetById)
+
+	return router
+}
+
 // Search responds with the list of all artists as JSON.
 func Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {

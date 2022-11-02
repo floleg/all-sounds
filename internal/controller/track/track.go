@@ -11,6 +11,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func AddRoutes(router *gin.Engine) *gin.Engine {
+	router.GET("/track", Search)
+	router.GET("/track/:id", GetById)
+
+	return router
+}
+
 // Search responds with the list of all artists as JSON.
 func Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
@@ -59,7 +66,7 @@ func GetById(c *gin.Context) {
 	}
 
 	var data model.Track
-	track, err := track.FindById(id, data)
+	err = track.FindById(id, &data)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
@@ -69,5 +76,5 @@ func GetById(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, track)
+	c.IndentedJSON(http.StatusOK, data)
 }

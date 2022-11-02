@@ -1,24 +1,40 @@
-package dockertest
+package user
 
 import (
+	"allsounds/internal/controller/track"
+	"allsounds/pkg/migration"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"allsounds/internal/router"
 	"allsounds/pkg/db"
 	"allsounds/pkg/model"
 )
 
+var router *gin.Engine
+
+func init() {
+	db.DBCon, _ = gorm.Open(sqlite.Open(":memory:"), nil)
+	migration.CreateTables()
+	artists := migration.BulkInsertArtists(2)
+	migration.BulkInsertAlbums(artists, 10)
+	migration.BulkInsertUsers(10)
+
+	router = gin.New()
+	AddRoutes(router)
+	track.AddRoutes(router)
+}
+
 // TestFindAllUsersWithoutPagination asserts that without offset or limit url parameters, endpoint will return 400
 func TestFindAllUsersWithoutPagination(t *testing.T) {
-	testRouter := router.NewRouter()
-
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/user", nil)
-	testRouter.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 
 	if w.Code != 400 {
 		t.Errorf("got %v, want %v", w.Code, 400)
@@ -31,13 +47,11 @@ func TestFindAllUsersWithoutPagination(t *testing.T) {
 
 // TestFindAllUsers validates endpoint pagination
 func TestFindAllUsers(t *testing.T) {
-	testRouter := router.NewRouter()
-
 	w := httptest.NewRecorder()
 
 	for i := 0; i <= 5; i += 1 {
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/user?offset=%v&limit=2", i), nil)
-		testRouter.ServeHTTP(w, req)
+		router.ServeHTTP(w, req)
 
 		if w.Code != 200 {
 			t.Errorf("got %v, want %v", w.Code, 200)
@@ -62,8 +76,6 @@ func TestUserById(t *testing.T) {
 		{name: "string"},
 	}
 
-	testRouter := router.NewRouter()
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.name == "int" {
@@ -72,13 +84,13 @@ func TestUserById(t *testing.T) {
 
 				w := httptest.NewRecorder()
 
-				testRouter.ServeHTTP(w, findAllReq)
+				router.ServeHTTP(w, findAllReq)
 				users := []model.User{}
 				json.NewDecoder(w.Body).Decode(&users)
 
 				// Fetch single user with previously retrieved id
 				req, _ := http.NewRequest("GET", fmt.Sprintf("/user/%v", users[0].ID), nil)
-				testRouter.ServeHTTP(w, req)
+				router.ServeHTTP(w, req)
 
 				if w.Code != 200 {
 					t.Errorf("got %v, want %v", w.Code, 200)
@@ -88,7 +100,7 @@ func TestUserById(t *testing.T) {
 
 				w := httptest.NewRecorder()
 
-				testRouter.ServeHTTP(w, req)
+				router.ServeHTTP(w, req)
 
 				if w.Code != 400 {
 					t.Errorf("got %v, want %v", w.Code, 400)
@@ -105,12 +117,10 @@ func TestUserById(t *testing.T) {
 
 // TestUserSearch validates the search endpoint
 func TestUserSearch(t *testing.T) {
-	testRouter := router.NewRouter()
-
 	query := ""
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/user?query=%s&offset=0&limit=10", query), nil)
-	testRouter.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 
 	var data []model.User
 	err := json.NewDecoder(w.Body).Decode(&data)
@@ -124,14 +134,12 @@ func TestUserSearch(t *testing.T) {
 }
 
 func TestAppendUserTrack(t *testing.T) {
-	testRouter := router.NewRouter()
-
 	// First search in user list to retrieve an actual user id
 	findUsersReq, _ := http.NewRequest("GET", "/user?offset=0&limit=1", nil)
 
 	w := httptest.NewRecorder()
 
-	testRouter.ServeHTTP(w, findUsersReq)
+	router.ServeHTTP(w, findUsersReq)
 	users := []model.User{}
 	err := json.NewDecoder(w.Body).Decode(&users)
 	if err != nil {
@@ -140,7 +148,7 @@ func TestAppendUserTrack(t *testing.T) {
 
 	// Retrieve a list of tracks to append
 	findTracksReq, _ := http.NewRequest("GET", "/track?offset=0&limit=10", nil)
-	testRouter.ServeHTTP(w, findTracksReq)
+	router.ServeHTTP(w, findTracksReq)
 	var tracks []model.Track
 	err = json.NewDecoder(w.Body).Decode(&tracks)
 	if err != nil {
@@ -150,7 +158,7 @@ func TestAppendUserTrack(t *testing.T) {
 	// Append 10 tracks to user
 	for _, track := range tracks {
 		appendReq, _ := http.NewRequest("POST", fmt.Sprintf("/user/%v/track/%v", users[0].ID, track.ID), nil)
-		testRouter.ServeHTTP(w, appendReq)
+		router.ServeHTTP(w, appendReq)
 	}
 
 	// Assert tracks have been added to current user
