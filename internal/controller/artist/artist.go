@@ -1,11 +1,9 @@
-// Package controller implements methods associated
-// to the application declared http routes.
-package controller
+package artist
 
 import (
 	"allsounds/pkg/model"
 	"allsounds/pkg/repository"
-	"allsounds/pkg/repository/album"
+	"allsounds/pkg/repository/artist"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
@@ -13,12 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Album struct exports the controller business API methods
-// providing responses to the declared server's routes
-type Album struct{}
-
-// Search getAlbums responds with the list of all albums as JSON.
-func (a Album) Search(c *gin.Context) {
+// Search responds with the list of all artists as JSON.
+func Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
@@ -42,20 +36,21 @@ func (a Album) Search(c *gin.Context) {
 		return
 	}
 
-	var data []model.Album
-	// If a query string has been passed, search albums by title, else fetch all
+	var data []model.Artist
+	// If a query string has been passed, search artists by title, else fetch all
 	if c.Query("query") != "" {
-		albums := repository.Search(offset, limit, c.Query("query"), data, "title")
-		c.IndentedJSON(http.StatusOK, albums)
+		artists := repository.Search(offset, limit, c.Query("query"), data, "name")
+		c.IndentedJSON(http.StatusOK, artists)
 	} else {
-		albums := repository.FindAll(offset, limit, data, "title")
-		c.IndentedJSON(http.StatusOK, albums)
+		artists := repository.FindAll(offset, limit, data, "name")
+		c.IndentedJSON(http.StatusOK, artists)
 	}
 }
 
-// GetById responds with a single album as JSON.
-func (a Album) GetById(c *gin.Context) {
+// GetById responds with a single artist as JSON.
+func GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
+
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
@@ -63,15 +58,15 @@ func (a Album) GetById(c *gin.Context) {
 		return
 	}
 
-	var data model.Album
+	var data model.Artist
+	artist, err := artist.FindById(id, data)
 
-	album, err := album.FindById(id, data)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
-		log.Warn().Msgf("Bad request: can't fetch Album entity with id %v", id)
+		log.Warn().Msgf("Bad request: can't fetch Artist entity with id %v", id)
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, album)
+	c.IndentedJSON(http.StatusOK, artist)
 }

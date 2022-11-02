@@ -1,9 +1,9 @@
-package controller
+package track
 
 import (
 	"allsounds/pkg/model"
 	"allsounds/pkg/repository"
-	"allsounds/pkg/repository/artist"
+	"allsounds/pkg/repository/track"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
@@ -11,12 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Artist struct exports the controller business API methods
-// providing responses to the declared server's routes
-type Artist struct{}
-
 // Search responds with the list of all artists as JSON.
-func (a Artist) Search(c *gin.Context) {
+func Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
@@ -40,19 +36,19 @@ func (a Artist) Search(c *gin.Context) {
 		return
 	}
 
-	var data []model.Artist
+	var data []model.Track
 	// If a query string has been passed, search artists by title, else fetch all
 	if c.Query("query") != "" {
-		artists := repository.Search(offset, limit, c.Query("query"), data, "name")
-		c.IndentedJSON(http.StatusOK, artists)
+		tracks := repository.Search(offset, limit, c.Query("query"), data, "title")
+		c.IndentedJSON(http.StatusOK, tracks)
 	} else {
-		artists := repository.FindAll(offset, limit, data, "name")
-		c.IndentedJSON(http.StatusOK, artists)
+		tracks := repository.FindAll(offset, limit, data, "title")
+		c.IndentedJSON(http.StatusOK, tracks)
 	}
 }
 
 // GetById responds with a single artist as JSON.
-func (a Artist) GetById(c *gin.Context) {
+func GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
@@ -62,15 +58,16 @@ func (a Artist) GetById(c *gin.Context) {
 		return
 	}
 
-	var data model.Artist
-	artist, err := artist.FindById(id, data)
+	var data model.Track
+	track, err := track.FindById(id, data)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
-		log.Warn().Msgf("Bad request: can't fetch Artist entity with id %v", id)
+		log.Warn().Msgf("request: can't fetch Track entity with id %v", id)
+
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, artist)
+	c.IndentedJSON(http.StatusOK, track)
 }
