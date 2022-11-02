@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Entity is the application's base gorm entity
 type Entity struct {
 	ID        uint `gorm:"primaryKey" faker:"-"`
 	CreatedAt time.Time
