@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// Test existing and unexisting filesystem config files
+// TestLoadConfig checks existing and non-existing filesystem config files
 func TestLoadConfig(t *testing.T) {
 	var tests = []struct {
 		name   string

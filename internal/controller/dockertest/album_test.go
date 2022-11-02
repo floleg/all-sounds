@@ -1,3 +1,5 @@
+// Package dockertest implements end-to-end integration tests
+// on the http routes layer
 package dockertest
 
 import (
@@ -11,7 +13,7 @@ import (
 	"allsounds/pkg/model"
 )
 
-// Without offset or limit url parameters, endpoint will return 400
+// TestFindAllAlbumsWithoutPagination asserts that without offset or limit url parameters, endpoint will return 400
 func TestFindAllAlbumsWithoutPagination(t *testing.T) {
 	testRouter := router.NewRouter()
 
@@ -28,7 +30,7 @@ func TestFindAllAlbumsWithoutPagination(t *testing.T) {
 	}
 }
 
-// Test endpoint pagination
+// TestFindAllAlbums validates endpoint pagination
 func TestFindAllAlbums(t *testing.T) {
 	testRouter := router.NewRouter()
 
@@ -54,7 +56,7 @@ func TestFindAllAlbums(t *testing.T) {
 	}
 }
 
-// Two cases: integer parameter and string parameter
+// TestAlbumById is a parameterized album id test suite
 func TestAlbumById(t *testing.T) {
 	var tests = []struct {
 		name  string
@@ -118,6 +120,7 @@ func TestAlbumById(t *testing.T) {
 	}
 }
 
+// TestAlbumsSearch validates the search endpoint
 func TestAlbumsSearch(t *testing.T) {
 	testRouter := router.NewRouter()
 

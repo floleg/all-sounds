@@ -1,5 +1,6 @@
 package model
 
+// User data entity
 type User struct {
 	Entity
 	Login  string  `faker:"username"`

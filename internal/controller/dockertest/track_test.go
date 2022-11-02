@@ -12,7 +12,7 @@ import (
 	"allsounds/pkg/model"
 )
 
-// Without offset or limit url parameters, endpoint will return 400
+// TestFindAllTracksWithoutPagination asserts that without offset or limit url parameters, endpoint will return 400
 func TestFindAllTracksWithoutPagination(t *testing.T) {
 	testRouter := router.NewRouter()
 
@@ -29,7 +29,7 @@ func TestFindAllTracksWithoutPagination(t *testing.T) {
 	}
 }
 
-// Test endpoint pagination
+// TestFindAllTracks validates endpoint pagination
 func TestFindAllTracks(t *testing.T) {
 	testRouter := router.NewRouter()
 
@@ -56,7 +56,7 @@ func TestFindAllTracks(t *testing.T) {
 	}
 }
 
-// Two cases: integer parameter and string parameter
+// TestTrackById is a parameterized artist id test suite
 func TestTrackById(t *testing.T) {
 	var tests = []struct {
 		name  string
@@ -111,7 +111,8 @@ func TestTrackById(t *testing.T) {
 
 }
 
-func TestSearchTrack(t *testing.T) {
+// TestTrackSearch validates the search endpoint
+func TestTrackSearch(t *testing.T) {
 	testRouter := router.NewRouter()
 
 	query := ""

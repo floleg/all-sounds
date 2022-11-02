@@ -1,5 +1,6 @@
 package model
 
+// Track data entity
 type Track struct {
 	Entity
 	Title    string `faker:"sentence"`
