@@ -12,13 +12,13 @@ import (
 	"allsounds/pkg/model"
 )
 
-// Without offset or limit url parameters, endpoint will return 400
+// TestFindAllUsersWithoutPagination asserts that without offset or limit url parameters, endpoint will return 400
 func TestFindAllUsersWithoutPagination(t *testing.T) {
-	router := router.NewRouter()
+	testRouter := router.NewRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/user", nil)
-	router.ServeHTTP(w, req)
+	testRouter.ServeHTTP(w, req)
 
 	if w.Code != 400 {
 		t.Errorf("got %v, want %v", w.Code, 400)
@@ -29,15 +29,15 @@ func TestFindAllUsersWithoutPagination(t *testing.T) {
 	}
 }
 
-// Test endpoint pagination
+// TestFindAllUsers validates endpoint pagination
 func TestFindAllUsers(t *testing.T) {
-	router := router.NewRouter()
+	testRouter := router.NewRouter()
 
 	w := httptest.NewRecorder()
 
 	for i := 0; i <= 5; i += 1 {
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/user?offset=%v&limit=2", i), nil)
-		router.ServeHTTP(w, req)
+		testRouter.ServeHTTP(w, req)
 
 		if w.Code != 200 {
 			t.Errorf("got %v, want %v", w.Code, 200)
@@ -52,7 +52,7 @@ func TestFindAllUsers(t *testing.T) {
 	}
 }
 
-// Two cases: integer parameter and string parameter
+// TestUserById is a parameterized artist id test suite
 func TestUserById(t *testing.T) {
 	var tests = []struct {
 		name  string
@@ -62,24 +62,23 @@ func TestUserById(t *testing.T) {
 		{name: "string"},
 	}
 
-	router := router.NewRouter()
+	testRouter := router.NewRouter()
 
 	for _, tt := range tests {
-		testname := fmt.Sprintf("%s", tt.name)
-		t.Run(testname, func(t *testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
 			if tt.name == "int" {
 				// First search in user list to retreieve an actual user id
 				findAllReq, _ := http.NewRequest("GET", "/user?offset=0&limit=1", nil)
 
 				w := httptest.NewRecorder()
 
-				router.ServeHTTP(w, findAllReq)
+				testRouter.ServeHTTP(w, findAllReq)
 				users := []model.User{}
 				json.NewDecoder(w.Body).Decode(&users)
 
 				// Fetch single user with previously retrieved id
 				req, _ := http.NewRequest("GET", fmt.Sprintf("/user/%v", users[0].ID), nil)
-				router.ServeHTTP(w, req)
+				testRouter.ServeHTTP(w, req)
 
 				if w.Code != 200 {
 					t.Errorf("got %v, want %v", w.Code, 200)
@@ -89,7 +88,7 @@ func TestUserById(t *testing.T) {
 
 				w := httptest.NewRecorder()
 
-				router.ServeHTTP(w, req)
+				testRouter.ServeHTTP(w, req)
 
 				if w.Code != 400 {
 					t.Errorf("got %v, want %v", w.Code, 400)
@@ -104,16 +103,20 @@ func TestUserById(t *testing.T) {
 
 }
 
-func TestSearchUser(t *testing.T) {
-	router := router.NewRouter()
+// TestUserSearch validates the search endpoint
+func TestUserSearch(t *testing.T) {
+	testRouter := router.NewRouter()
 
 	query := ""
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/user?query=%s&offset=0&limit=10", query), nil)
-	router.ServeHTTP(w, req)
+	testRouter.ServeHTTP(w, req)
 
-	data := []model.User{}
-	json.NewDecoder(w.Body).Decode(&data)
+	var data []model.User
+	err := json.NewDecoder(w.Body).Decode(&data)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
 	if len(data) != 10 {
 		t.Errorf("got %v, want %v", len(data), 10)
@@ -121,27 +124,33 @@ func TestSearchUser(t *testing.T) {
 }
 
 func TestAppendUserTrack(t *testing.T) {
-	router := router.NewRouter()
+	testRouter := router.NewRouter()
 
-	// First search in user list to retreieve an actual user id
+	// First search in user list to retrieve an actual user id
 	findUsersReq, _ := http.NewRequest("GET", "/user?offset=0&limit=1", nil)
 
 	w := httptest.NewRecorder()
 
-	router.ServeHTTP(w, findUsersReq)
+	testRouter.ServeHTTP(w, findUsersReq)
 	users := []model.User{}
-	json.NewDecoder(w.Body).Decode(&users)
+	err := json.NewDecoder(w.Body).Decode(&users)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
 	// Retrieve a list of tracks to append
 	findTracksReq, _ := http.NewRequest("GET", "/track?offset=0&limit=10", nil)
-	router.ServeHTTP(w, findTracksReq)
-	tracks := []model.Track{}
-	json.NewDecoder(w.Body).Decode(&tracks)
+	testRouter.ServeHTTP(w, findTracksReq)
+	var tracks []model.Track
+	err = json.NewDecoder(w.Body).Decode(&tracks)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
 	// Append 10 tracks to user
 	for _, track := range tracks {
 		appendReq, _ := http.NewRequest("POST", fmt.Sprintf("/user/%v/track/%v", users[0].ID, track.ID), nil)
-		router.ServeHTTP(w, appendReq)
+		testRouter.ServeHTTP(w, appendReq)
 	}
 
 	// Assert tracks have been added to current user

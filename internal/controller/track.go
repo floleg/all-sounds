@@ -3,30 +3,41 @@ package controller
 import (
 	"allsounds/pkg/model"
 	"allsounds/pkg/repository"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type TrackController struct{}
+// Track struct exports the controller business API methods
+// providing responses to the declared server's routes
+type Track struct{}
 
-var trackRepository = new(repository.TrackRepository)
+var trackRepository = new(repository.Track)
 
-// responds with the list of all artists as JSON.
-func (t TrackController) Search(c *gin.Context) {
+// Search responds with the list of all artists as JSON.
+func (t Track) Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msg("Bad request: missing offset or limit parameter")
 		return
 	}
 
 	offset, err := strconv.Atoi(c.Query("offset"))
-	limit, err := strconv.Atoi(c.Query("limit"))
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msg("Bad request: invalid offset parameter")
+		return
+	}
+
+	limit, err := strconv.Atoi(c.Query("limit"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		c.Abort()
+		log.Warn().Msg("Bad request: invalid limit parameter")
 		return
 	}
 
@@ -41,13 +52,14 @@ func (t TrackController) Search(c *gin.Context) {
 	}
 }
 
-// responds with a single artist as JSON.
-func (t TrackController) GetById(c *gin.Context) {
+// GetById responds with a single artist as JSON.
+func (t Track) GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msg("Bad request: invalid id parameter")
 		return
 	}
 
@@ -57,6 +69,8 @@ func (t TrackController) GetById(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
+		log.Warn().Msgf("request: can't fetch Track entity with id %v", id)
+
 		return
 	}
 
