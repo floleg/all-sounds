@@ -19,3 +19,6 @@
 
 # Jetbrains
 .idea
+
+# env file
+*.env
