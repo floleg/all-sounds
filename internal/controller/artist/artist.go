@@ -66,7 +66,7 @@ func GetById(c *gin.Context) {
 	}
 
 	var data model.Artist
-	artist, err := artist.FindById(id, data)
+	artistEntity, err := artist.FindById(id, data)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
@@ -75,5 +75,5 @@ func GetById(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, artist)
+	c.IndentedJSON(http.StatusOK, artistEntity)
 }

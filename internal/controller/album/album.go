@@ -1,4 +1,4 @@
-// Package controller implements methods associated
+// Package album implements methods associated
 // to the application declared http routes.
 package album
 
@@ -68,7 +68,7 @@ func GetById(c *gin.Context) {
 
 	var data model.Album
 
-	album, err := album.FindById(id, data)
+	albumEntity, err := album.FindById(id, data)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
@@ -76,5 +76,5 @@ func GetById(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, album)
+	c.IndentedJSON(http.StatusOK, albumEntity)
 }
