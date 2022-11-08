@@ -9,47 +9,51 @@ import (
 func TestLoadConfig(t *testing.T) {
 	var tests = []struct {
 		name   string
+		args   map[string]string
 		config Config
-		panic  bool
+		err    bool
 	}{
 		{
-			name:   "dev",
-			config: Config{"localhost", "5432", "postgres", "-NQI2tIM?|G>B@A2", "all-sounds"},
-			panic:  false,
+			name: "dev",
+			args: map[string]string{
+				"DB_HOST":     "localhost",
+				"DB_PORT":     "5432",
+				"DB_USER":     "postgres",
+				"DB_PASSWORD": "supersecurepass",
+				"DB_NAME":     "all-sounds",
+			},
+			config: Config{"localhost", "5432", "postgres", "supersecurepass", "all-sounds"},
+			err:    false,
 		},
 		{
-			name:   "docker",
-			config: Config{"db", "5432", "postgres", "-NQI2tIM?|G>B@A2", "all-sounds"},
-			panic:  false,
+			name: "docker",
+			args: map[string]string{
+				"DB_HOST":     "db",
+				"DB_PORT":     "5432",
+				"DB_USER":     "postgres",
+				"DB_PASSWORD": "supersecurepass2",
+				"DB_NAME":     "all-sounds-docker",
+			},
+			config: Config{"db", "5432", "postgres", "supersecurepass2", "all-sounds-docker"},
+			err:    false,
 		},
 		{
 			name:   "preprod",
 			config: Config{},
-			panic:  true,
 		},
 	}
 
 	for _, tt := range tests {
 		testname := fmt.Sprintf("%s", tt.name)
 		t.Run(testname, func(t *testing.T) {
-			// Here we expect LoadConfig to panic because the config file should not exist
-			// USe the https://go.dev/doc/effective_go#recover trick to regain routine control
-			if tt.panic {
-				defer func() {
-					if r := recover(); r != nil {
-						fmt.Println("Recovered in f", r)
-					}
-				}()
+			for key, value := range tt.args {
+				t.Setenv(key, value)
+			}
 
-				LoadConfig(tt.name, "../../configs")
-				t.Errorf("Panic was expected")
-			} else {
-				// Check that the loaded confiuration is conform as exepected if the file exists on filesytem
-				config, _ := LoadConfig(tt.name, "../../configs")
+			config, _ := LoadConfig()
 
-				if config != tt.config {
-					t.Errorf("got %v, want %v", config, tt.config)
-				}
+			if config != tt.config {
+				t.Errorf("got %v, want %v", config, tt.config)
 			}
 		})
 	}

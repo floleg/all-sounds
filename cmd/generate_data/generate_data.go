@@ -1,8 +1,6 @@
-// Package cmd/server is used to run the API server as a cli tool
 package main
 
 import (
-	"allsounds/internal/router"
 	"allsounds/pkg/config"
 	"allsounds/pkg/db"
 	"allsounds/pkg/migration"
@@ -22,13 +20,9 @@ func main() {
 		log.Fatal().Err(err).Msg("cannot initiate db connection")
 	}
 
-	// Run initial SQL migrations
-	migration.CreateTables()
+	artists := migration.BulkInsertArtists(2)
 
-	// Instantiate gin router
-	appRouter := router.NewRouter()
-	err = appRouter.Run("0.0.0.0:8080")
-	if err != nil {
-		log.Fatal().Err(err).Msg("cannot instantiate http server")
-	}
+	migration.BulkInsertAlbums(artists, 10)
+
+	migration.BulkInsertUsers(10)
 }

@@ -1,8 +1,9 @@
-package controller
+package track
 
 import (
 	"allsounds/pkg/model"
 	"allsounds/pkg/repository"
+	"allsounds/pkg/repository/track"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
@@ -10,14 +11,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Track struct exports the controller business API methods
-// providing responses to the declared server's routes
-type Track struct{}
+func AddRoutes(router *gin.Engine) *gin.Engine {
+	router.GET("/track", Search)
+	router.GET("/track/:id", GetById)
 
-var trackRepository = new(repository.Track)
+	return router
+}
 
 // Search responds with the list of all artists as JSON.
-func (t Track) Search(c *gin.Context) {
+func Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
@@ -44,16 +46,16 @@ func (t Track) Search(c *gin.Context) {
 	var data []model.Track
 	// If a query string has been passed, search artists by title, else fetch all
 	if c.Query("query") != "" {
-		tracks := trackRepository.BaseRepo.Search(offset, limit, c.Query("query"), data, "title")
+		tracks := repository.Search(offset, limit, c.Query("query"), data, "title")
 		c.IndentedJSON(http.StatusOK, tracks)
 	} else {
-		tracks := trackRepository.BaseRepo.FindAll(offset, limit, data, "title")
+		tracks := repository.FindAll(offset, limit, data, "title")
 		c.IndentedJSON(http.StatusOK, tracks)
 	}
 }
 
 // GetById responds with a single artist as JSON.
-func (t Track) GetById(c *gin.Context) {
+func GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
@@ -64,7 +66,7 @@ func (t Track) GetById(c *gin.Context) {
 	}
 
 	var data model.Track
-	track, err := trackRepository.FindById(id, data)
+	err = track.FindById(id, &data)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
@@ -74,5 +76,5 @@ func (t Track) GetById(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, track)
+	c.IndentedJSON(http.StatusOK, data)
 }

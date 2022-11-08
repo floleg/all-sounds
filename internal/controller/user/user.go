@@ -1,9 +1,11 @@
-package controller
+package user
 
 import (
 	"allsounds/pkg/db"
 	"allsounds/pkg/model"
 	"allsounds/pkg/repository"
+	"allsounds/pkg/repository/track"
+	"allsounds/pkg/repository/user"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
@@ -11,14 +13,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// User struct exports the controller business API methods
-// providing responses to the declared server's routes
-type User struct{}
+func AddRoutes(router *gin.Engine) *gin.Engine {
+	router.GET("/user", Search)
+	router.GET("/user/:id", GetById)
+	router.POST("/user/:userId/track/:trackId", AppendUserTrack)
 
-var userRepository = new(repository.User)
+	return router
+}
 
 // Search responds with the list of all artists as JSON.
-func (u User) Search(c *gin.Context) {
+func Search(c *gin.Context) {
 	if c.Query("offset") == "" || c.Query("limit") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		c.Abort()
@@ -45,16 +49,16 @@ func (u User) Search(c *gin.Context) {
 	var data []model.User
 	// If a query string has been passed, search artists by title, else fetch all
 	if c.Query("query") != "" {
-		users := userRepository.BaseRepo.Search(offset, limit, c.Query("query"), data, "login")
+		users := repository.Search(offset, limit, c.Query("query"), data, "login")
 		c.IndentedJSON(http.StatusOK, users)
 	} else {
-		users := userRepository.BaseRepo.FindAll(offset, limit, data, "login")
+		users := repository.FindAll(offset, limit, data, "login")
 		c.IndentedJSON(http.StatusOK, users)
 	}
 }
 
 // GetById responds with a single artist as JSON.
-func (u User) GetById(c *gin.Context) {
+func GetById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
@@ -65,7 +69,7 @@ func (u User) GetById(c *gin.Context) {
 	}
 
 	var data model.User
-	user, err := userRepository.FindById(id, data)
+	err = user.FindById(id, &data)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
@@ -74,11 +78,11 @@ func (u User) GetById(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, user)
+	c.IndentedJSON(http.StatusOK, data)
 }
 
 // AppendUserTrack responds with a single user as JSON.
-func (u User) AppendUserTrack(c *gin.Context) {
+func AppendUserTrack(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("userId"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
@@ -95,15 +99,15 @@ func (u User) AppendUserTrack(c *gin.Context) {
 		return
 	}
 
-	user := model.User{}
-	userRepository.BaseRepo.FindById(userId, &user)
+	usr := model.User{}
+	user.FindById(userId, &usr)
 
-	track := model.Track{}
-	trackRepository.BaseRepo.FindById(trackId, &track)
+	trk := model.Track{}
+	track.FindById(trackId, &trk)
 
-	user.Tracks = append(user.Tracks, track)
+	usr.Tracks = append(usr.Tracks, trk)
 
-	db.DBCon.Omit("Track").Save(&user)
+	db.DBCon.Omit("Track").Save(&usr)
 
-	c.IndentedJSON(http.StatusOK, user)
+	c.IndentedJSON(http.StatusOK, usr)
 }

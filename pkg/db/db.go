@@ -17,12 +17,12 @@ var (
 	DBCon *gorm.DB
 )
 
-// Init method does three things:
+// InitPostgresDB method does three things:
 //
 //   - Build a gorm postgres connection string based on the runtime configuration
 //   - Instantiate a gorm SQL logger to monitor the executed queries
 //   - Open a postgres connection
-func Init(config *config.Config) error {
+func InitPostgresDB(config *config.Config) error {
 	// Build gorm connection string
 	conn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		config.DBHost, config.DBPort, config.DBUSer, config.DBPassword, config.DBName)
