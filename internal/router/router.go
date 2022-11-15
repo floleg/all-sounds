@@ -18,7 +18,7 @@ func NewRouter() *gin.Engine {
 	router.Use(gin.Recovery())
 
 	// Album entity routes declarations
-	album.AddRoutes(router)
+	album.AddRoutes(router, album.Middleware{})
 
 	// Artist entity routes declarations
 	artist.AddRoutes(router)

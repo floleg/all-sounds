@@ -3,14 +3,10 @@
 package album
 
 import (
-	"allsounds/pkg/db"
-	"allsounds/pkg/migration"
 	"allsounds/pkg/model"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,15 +14,29 @@ import (
 
 var router *gin.Engine
 
-func init() {
-	db.DBCon, _ = gorm.Open(sqlite.Open(":memory:"), nil)
-	migration.CreateTables()
-	artists := migration.BulkInsertArtists(2)
-	migration.BulkInsertAlbums(artists, 10)
-	migration.BulkInsertUsers(10)
+type albumRepository struct{}
 
+func (a albumRepository) FindById(id int, data *model.Album) error {
+	data.Entity = model.Entity{ID: uint(id)}
+	data.Title = "Album1"
+	data.ReleaseYear = 0
+	data.Tracks = nil
+
+	return nil
+}
+
+type testMiddleware struct{}
+
+func (m testMiddleware) DB(handler gin.HandlerFunc) gin.HandlerFunc {
+	return func(context *gin.Context) {
+		context.Set("db", albumRepository{})
+		handler(context)
+	}
+}
+
+func init() {
 	router = gin.New()
-	AddRoutes(router)
+	AddRoutes(router, testMiddleware{})
 }
 
 // TestFindAllAlbumsWithoutPagination asserts that without offset or limit url parameters, endpoint will return 400
@@ -68,6 +78,23 @@ func TestFindAllAlbums(t *testing.T) {
 	}
 }
 
+func TestControllerGetById(t *testing.T) {
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/album/%v", 0), nil)
+	router.ServeHTTP(w, req)
+
+	if w.Code != 200 {
+		t.Errorf("got %v, want %v", w.Code, 200)
+	}
+
+	albumData := model.Album{}
+
+	err := json.NewDecoder(w.Body).Decode(&albumData)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 // TestAlbumById is a parameterized album id test suite
 func TestAlbumById(t *testing.T) {
 	var tests = []struct {
@@ -87,7 +114,7 @@ func TestAlbumById(t *testing.T) {
 				w := httptest.NewRecorder()
 
 				router.ServeHTTP(w, findAllReq)
-				albums := []model.Album{}
+				var albums []model.Album
 				err := json.NewDecoder(w.Body).Decode(&albums)
 				if err != nil {
 					t.Errorf(err.Error())
@@ -97,19 +124,19 @@ func TestAlbumById(t *testing.T) {
 				req, _ := http.NewRequest("GET", fmt.Sprintf("/album/%v", albums[0].ID), nil)
 				router.ServeHTTP(w, req)
 
-				album := model.Album{}
+				albumData := model.Album{}
 
 				if w.Code != 200 {
 					t.Errorf("got %v, want %v", w.Code, 200)
 				}
 
-				err = json.NewDecoder(w.Body).Decode(&album)
+				err = json.NewDecoder(w.Body).Decode(&albumData)
 				if err != nil {
 					t.Errorf(err.Error())
 				}
 
-				if len(album.Tracks) != 10 {
-					t.Errorf("got %v, want %v", len(album.Tracks), 10)
+				if len(albumData.Tracks) != 10 {
+					t.Errorf("got %v, want %v", len(albumData.Tracks), 10)
 				}
 			} else {
 				req, _ := http.NewRequest("GET", "/album/misguided-id", nil)

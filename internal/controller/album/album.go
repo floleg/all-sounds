@@ -13,9 +13,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AddRoutes(router *gin.Engine) *gin.Engine {
+type middleware interface {
+	DB(handler gin.HandlerFunc) gin.HandlerFunc
+}
+
+// Middleware implement handler wrapper methods
+type Middleware struct{}
+
+func (m Middleware) DB(handler gin.HandlerFunc) gin.HandlerFunc {
+	return func(context *gin.Context) {
+		context.Set("db", album.Album{})
+		handler(context)
+	}
+}
+
+func AddRoutes(router *gin.Engine, m middleware) *gin.Engine {
 	router.GET("/album", Search)
-	router.GET("/album/:id", GetById)
+	router.GET("/album/:id", m.DB(GetById))
 
 	return router
 }
@@ -68,13 +82,15 @@ func GetById(c *gin.Context) {
 
 	var data model.Album
 
-	albumEntity, err := album.FindById(id, data)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
-		c.Abort()
-		log.Warn().Msgf("Bad request: can't fetch Album entity with id %v", id)
-		return
+	if db, ok := c.Get("db"); ok {
+		err = db.(album.Repository).FindById(id, &data)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+			c.Abort()
+			log.Warn().Msgf("Bad request: can't fetch Album entity with id %v", id)
+			return
+		}
 	}
 
-	c.IndentedJSON(http.StatusOK, albumEntity)
+	c.IndentedJSON(http.StatusOK, data)
 }
